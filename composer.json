@@ -2,7 +2,7 @@
     "name" : "quiqqer/quiqqer",
     "type" : "quiqqer-system",
     "description" : "A modular based management system written in JavaScript and PHP",
-    "version" : "master-dev",
+    "version" : "1.0.5",
     "license" : "GPL-3.0+",
 
     "authors" : [{
