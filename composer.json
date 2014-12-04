@@ -42,7 +42,7 @@
         "quiqqer/ckeditor4" : "0.9.*",
         "quiqqer/calendar" : "2.*",
         "quiqqer/countries" : "0.9.*",
-        "quiqqer/colorpicker" : "0.9.*",
+        "quiqqer/colorpicker" : "1.*",
         "quiqqer/translator" : "0.9.*",
         "quiqqer/utils" : "1.*",
         "quiqqer/installer" : "*@dev",
