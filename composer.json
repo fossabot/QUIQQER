@@ -40,7 +40,7 @@
         "quiqqer/smarty": "3.*",
         "quiqqer/smarty3" : "*@dev",
         "quiqqer/ckeditor4" : "0.9.*",
-        "quiqqer/calendar" : "0.9.*",
+        "quiqqer/calendar" : "2.*",
         "quiqqer/countries" : "0.9.*",
         "quiqqer/colorpicker" : "0.9.*",
         "quiqqer/translator" : "0.9.*",
