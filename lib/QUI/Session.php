@@ -155,6 +155,8 @@ class Session
 
             $Memcached = new \Memcached('quiqqer');
 
+            // $Memcached->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+
             foreach ($memcached_data as $serverData) {
                 $serverData = explode(':', $serverData);
 
