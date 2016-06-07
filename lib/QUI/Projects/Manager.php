@@ -357,23 +357,23 @@ class Manager
      * Returns a project
      *
      * @param string $project - Project name
-     * @param string|boolean $lang - Project lang, optional (if not set, the standard language used)
+     * @param string|boolean $country - Project country, optional (if not set, the standard country used)
      * @param string|boolean $template - used template, optional (if not set, the standard templaed used)
      *
      * @return \QUI\Projects\Project
      */
-    public static function getProject($project, $lang = false, $template = false)
+    public static function getProject($project, $country = false, $template = false)
     {
-        if ($lang == false && isset(self::$projects[$project])
+        if ($country == false && isset(self::$projects[$project])
             && isset(self::$projects[$project]['_standard'])
         ) {
             return self::$projects[$project]['_standard'];
         }
 
         if (isset(self::$projects[$project])
-            && isset(self::$projects[$project][$lang])
+            && isset(self::$projects[$project][$country])
         ) {
-            return self::$projects[$project][$lang];
+            return self::$projects[$project][$country];
         }
 
         // Wenn der RAM zu voll wird, Objekte mal leeren
@@ -382,19 +382,17 @@ class Manager
         }
 
 
-        if ($lang === false) {
+        if ($country === false) {
             self::$projects[$project]['_standard'] = new QUI\Projects\Project($project);
 
             return self::$projects[$project]['_standard'];
         }
 
-        self::$projects[$project][$lang] = new QUI\Projects\Project(
-            $project,
-            $lang,
-            $template
-        );
+        $Project = new QUI\Projects\Project($project, $country, $template);
 
-        return self::$projects[$project][$lang];
+        self::$projects[$project][$country] = $Project;
+
+        return $Project;
     }
 
     /**
@@ -768,7 +766,7 @@ class Manager
         );
 
         $project = $Project->getName();
-        $langs   = $Project->getAttribute('langs');
+        $langs   = $Project->getLanguages();
 
         $DataBase = QUI::getDataBase();
         $Table    = $DataBase->Table();

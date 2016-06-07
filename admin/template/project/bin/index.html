@@ -4,14 +4,14 @@
 <head>
 	<!-- [begin] meta -->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="content-language" content="{$Project->getAttribute('lang')}" />
+	<meta http-equiv="content-language" content="{$Project->getLanguage()}" />
 
 	<meta name="page-topic" content="{$Site->getAttribute('title')|escape:"html"}" />
 
 	<meta name="description" content="{if $Site->getAttribute('pcsg.base.description')}{$Site->getAttribute('pcsg.base.description')|escape:"html"}{else}{$Project->getConfig('description')|escape:"html"}{/if}" />
 	<meta name="keywords" content="{if $Site->getAttribute('pcsg.base.keywords')}{$Site->getAttribute('pcsg.base.keywords')|escape:"html"}{else}{$Project->getConfig('keywords')|escape:"html"}{/if}" />
 	<meta name="date" content="{$Site->getAttribute('e_date')}" />
-	<meta name="lang" content="{$Project->getAttribute('lang')}" />
+	<meta name="lang" content="{$Project->getLang()}" />
 	<meta name="robots" content="{if $Site->getAttribute('pcsg.base.robots')}{$Site->getAttribute('pcsg.base.robots')}{else}{$Project->getConfig('robots')}{/if}" />
 	<meta name="generator" content="{$smarty.const.GENERATOR}" />
 

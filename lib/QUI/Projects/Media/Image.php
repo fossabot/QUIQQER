@@ -258,7 +258,7 @@ class Image extends Item implements QUI\Interfaces\Projects\Media\File
         }
 
         return array(
-            'width' => $newwidth,
+            'width'  => $newwidth,
             'height' => $newheight
         );
     }
@@ -403,9 +403,9 @@ class Image extends Item implements QUI\Interfaces\Projects\Media\File
             }
         } catch (\Exception $Exception) {
             QUI\System\Log::addInfo($Exception->getMessage(), array(
-                'file' => $this->getFullPath(),
+                'file'   => $this->getFullPath(),
                 'fileId' => $this->getId(),
-                'info' => 'watermark creation'
+                'info'   => 'watermark creation'
             ));
         }
 
@@ -453,7 +453,7 @@ class Image extends Item implements QUI\Interfaces\Projects\Media\File
 
         // delete admin cache
         $cache_folder
-            = VAR_DIR . 'media_cache/' . $Project->getAttribute('name') . '/';
+            = VAR_DIR . 'media_cache/' . $Project->getName() . '/';
 
         if (!is_dir($cache_folder)) {
             return;

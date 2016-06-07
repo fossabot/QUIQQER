@@ -197,12 +197,12 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
         // DB Tables
         $this->TABLE        = $Project->getAttribute('db_table');
         $this->RELTABLE     = $this->TABLE . '_relations';
-        $this->RELLANGTABLE = $Project->getAttribute('name') . '_multilingual';
+        $this->RELLANGTABLE = $Project->getName() . '_multilingual';
 
         // Cachefiles
         $this->CACHENAME = 'site/' .
-                           $Project->getAttribute('name') . '/' .
-                           $Project->getAttribute('lang') . '/' .
+                           $Project->getName() . '/' .
+                           $Project->getLang() . '/' .
                            $this->getId();
 
 
@@ -627,7 +627,7 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
 
         $Project = $this->getProject();
 
-        if ($lang == $Project->getAttribute('lang')) {
+        if ($lang == $Project->getLang()) {
             return true;
         }
 
@@ -645,11 +645,7 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
         }
 
         try {
-            $_Project = QUI::getProject(
-                $Project->getAttribute('name'),
-                $lang
-            );
-
+            $_Project = QUI::getProject($Project->getName(), $lang);
             $_Project->get($lang_id);
 
             return true;
@@ -674,13 +670,13 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
             $Project = $this->getProject();
 
             $dbResult = QUI::getDataBase()->fetch(array(
-                'from'  => $Project->getAttribute('name') . '_multilingual',
+                'from'  => $Project->getName() . '_multilingual',
                 'where' => array(
-                    $Project->getAttribute('lang') => $this->getId()
+                    $Project->getLang() => $this->getId()
                 )
             ));
 
-            $langs = $Project->getAttribute('langs');
+            $langs = $Project->getLanguages();
 
             foreach ($langs as $lang) {
                 if (isset($dbResult[0][$lang])) {
@@ -716,7 +712,7 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
         // other languages
         $Project = $this->getProject();
 
-        if ($lang === $Project->getAttribute('lang')) {
+        if ($lang === $Project->getLang()) {
             return $this->id;
         }
 
@@ -725,10 +721,10 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
             return $this->lang_ids[$lang];
         }
 
-        $availableLangs = $Project->getAttribute('langs');
+        $availableLangs = $Project->getLanguages();
 
-        $pname = $Project->getAttribute('name');
-        $plang = $Project->getAttribute('lang');
+        $pname = $Project->getName();
+        $plang = $Project->getLang();
 
         if ($lang && !in_array($lang, $availableLangs)) {
             throw new QUI\Exception(
@@ -1335,7 +1331,8 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
 
         $str = 'index.php?id=' . $this->getId() .
                '&project=' . $this->getProject()->getName() .
-               '&lang=' . $this->getProject()->getLang();
+               '&lang=' . $this->getProject()->getLang() .
+               '&country=' . $this->getProject()->getCountryCode();
 
         foreach ($params as $param => $value) {
             if (empty($value)) {

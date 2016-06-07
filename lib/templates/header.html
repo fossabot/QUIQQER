@@ -11,7 +11,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
     {if $Template->getAttribute('html5') === false}
-    <meta http-equiv="content-language" content="{$Project->getlang()}" />
+    <meta http-equiv="content-language" content="{$Project->getLang()}" />
     <meta name="page-topic" content="{$Site->getAttribute('title')|escape:"html"}" />
 
     <meta name="date" content="{$Site->getAttribute('e_date')}" />
@@ -160,7 +160,7 @@
     {/if}
 
     {assign var=projectLang value=$Project->getLang()}
-    {assign var=projectLangs value=$Project->getAttribute('langs')}
+    {assign var=projectLangs value=$Project->getLanguages()}
     {foreach from=$projectLangs item=lang}
     {if $projectLang != $lang && $Site->existLang( $lang )}
         <link rel="alternate" hreflang="{$lang}" href="{url id=$Site->getId( $lang ) lang=$lang}" />

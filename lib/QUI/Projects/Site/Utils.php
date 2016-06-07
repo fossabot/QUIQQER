@@ -122,7 +122,7 @@ class Utils
 
         // @todo als event
         // URL Filter
-        $name   = $Project->getAttribute('name');
+        $name   = $Project->getName();
         $filter = USR_DIR . 'lib/' . $name . '/url.filter.php';
         $func   = 'url_filter_' . $name;
 
@@ -210,7 +210,7 @@ class Utils
 
                 // table is ok
                 $result[] = array(
-                    'file' => $file,
+                    'file'    => $file,
                     'package' => $package
                 );
             }
@@ -303,10 +303,10 @@ class Utils
                 }
 
                 $result[] = array(
-                    'table' => $table,
-                    'data' => $data,
+                    'table'   => $table,
+                    'data'    => $data,
                     'package' => $package,
-                    'suffix' => $suffix
+                    'suffix'  => $suffix
                 );
             }
         }
@@ -363,7 +363,7 @@ class Utils
             foreach ($attributes as $Attribute) {
                 $result[] = array(
                     'attribute' => trim($Attribute->nodeValue),
-                    'default' => $Attribute->getAttribute('default')
+                    'default'   => $Attribute->getAttribute('default')
                 );
             }
         }
@@ -388,7 +388,7 @@ class Utils
             foreach ($attributes as $Attribute) {
                 $result[] = array(
                     'attribute' => trim($Attribute->nodeValue),
-                    'default' => $Attribute->getAttribute('default')
+                    'default'   => $Attribute->getAttribute('default')
                 );
             }
         }
@@ -589,8 +589,8 @@ class Utils
                 705,
                 array(
                     'method' => 'getSiteByLink',
-                    'class' => 'QUI/projects/Site/Utils',
-                    'link' => $link
+                    'class'  => 'QUI/projects/Site/Utils',
+                    'link'   => $link
                 )
             );
         }
@@ -606,8 +606,8 @@ class Utils
                 705,
                 array(
                     'method' => 'getSiteByLink',
-                    'class' => 'QUI/projects/Site/Utils',
-                    'link' => $link
+                    'class'  => 'QUI/projects/Site/Utils',
+                    'link'   => $link
                 )
             );
         }
@@ -685,14 +685,14 @@ class Utils
         // query params
         if (!empty($ids)) {
             $where['id'] = array(
-                'type' => 'IN',
+                'type'  => 'IN',
                 'value' => $ids
             );
         }
 
         if (!empty($types)) {
             $where['type'] = array(
-                'type' => 'IN',
+                'type'  => 'IN',
                 'value' => $types
             );
         }
@@ -714,7 +714,7 @@ class Utils
             }
 
             $where['id'] = array(
-                'type' => 'IN',
+                'type'  => 'IN',
                 'value' => $ids
             );
 
@@ -729,8 +729,8 @@ class Utils
         // by no parents, we use WHERE OR
         return $Project->getSites(array(
             'where_or' => $where,
-            'limit' => $limit,
-            'order' => $order
+            'limit'    => $limit,
+            'order'    => $order
         ));
     }
 
@@ -755,8 +755,8 @@ class Utils
                 705,
                 array(
                     'method' => 'rewriteSiteLink',
-                    'class' => 'QUI/projects/Site/Utils',
-                    'link' => $link
+                    'class'  => 'QUI/projects/Site/Utils',
+                    'link'   => $link
                 )
             );
         }
@@ -772,8 +772,8 @@ class Utils
                 705,
                 array(
                     'method' => 'rewriteSiteLink',
-                    'class' => 'QUI/projects/Site/Utils',
-                    'link' => $link
+                    'class'  => 'QUI/projects/Site/Utils',
+                    'link'   => $link
                 )
             );
         }

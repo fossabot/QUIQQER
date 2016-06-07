@@ -79,6 +79,13 @@ class Rewrite
     private $lang = false;
 
     /**
+     * project country
+     *
+     * @var string
+     */
+    private $country = false;
+
+    /**
      * active site
      *
      * @var \QUI\Projects\Site
@@ -300,9 +307,13 @@ class Rewrite
                 && (strlen($_url[0]) == 2
                     || strlen(str_replace($defaultSuffix, '', $_url[0])) == 2)
             ) {
-                $this->lang = str_replace($defaultSuffix, '', $_url[0]);
+                $this->country = str_replace($defaultSuffix, '', $_url[0]);
 
-                QUI::getLocale()->setCurrent($this->lang);
+                try {
+                    $Country = Countries\Manager::get($this->country);
+                    QUI::getLocale()->setCurrent($Country->getLang());
+                } catch (QUI\Exception $Exception) {
+                }
 
                 unset($_url[0]);
 
@@ -319,14 +330,13 @@ class Rewrite
                 // @todo https host nicht über den port prüfen, zu ungenau
                 if (isset($_SERVER['HTTP_HOST'])
                     && isset($vhosts[$_SERVER['HTTP_HOST']])
-                    && isset($vhosts[$_SERVER['HTTP_HOST']][$this->lang])
-                    && !empty($vhosts[$_SERVER['HTTP_HOST']][$this->lang])
+                    && isset($vhosts[$_SERVER['HTTP_HOST']][$this->country])
+                    && !empty($vhosts[$_SERVER['HTTP_HOST']][$this->country])
                     && (int)$_SERVER['SERVER_PORT'] !== 443
-                    && QUI::conf('globals', 'httpshost') !=
-                       'https://' . $_SERVER['HTTP_HOST']
+                    && QUI::conf('globals', 'httpshost') != 'https://' . $_SERVER['HTTP_HOST']
                 ) {
                     $url = implode('/', $_url);
-                    $url = $vhosts[$_SERVER['HTTP_HOST']][$this->lang] . URL_DIR . $url;
+                    $url = $vhosts[$_SERVER['HTTP_HOST']][$this->country] . URL_DIR . $url;
                     $url = QUI\Utils\StringHelper::replaceDblSlashes($url);
                     $url = 'http://' . $this->project_prefix . $url;
 
@@ -508,16 +518,16 @@ class Rewrite
             // und es nicht der https host ist
             if (isset($_SERVER['HTTP_HOST'])
                 && isset($vhosts[$_SERVER['HTTP_HOST']])
-                && isset($vhosts[$_SERVER['HTTP_HOST']][$this->lang])
+                && isset($vhosts[$_SERVER['HTTP_HOST']][$this->country])
                 && $_SERVER['HTTP_HOST']
-                   != $vhosts[$_SERVER['HTTP_HOST']][$this->lang]
+                   != $vhosts[$_SERVER['HTTP_HOST']][$this->country]
                 && (int)$_SERVER['SERVER_PORT'] !== 443
                 && QUI::conf('globals', 'httpshost') !=
                    'https://' . $_SERVER['HTTP_HOST']
             ) {
                 $url = $this->site->getUrlRewritten();
                 $url
-                     = $vhosts[$_SERVER['HTTP_HOST']][$this->lang] . URL_DIR . $url;
+                     = $vhosts[$_SERVER['HTTP_HOST']][$this->country] . URL_DIR . $url;
                 $url = QUI\Utils\StringHelper::replaceDblSlashes($url);
                 $url = 'http://' . $this->project_prefix . $url;
 
@@ -544,23 +554,15 @@ class Rewrite
         } else {
             $vhosts = $this->getVHosts();
 
-            //$url = $this->first_child->getUrlRewrited();
-
             /**
              * Sprache behandeln
              * Falls für die Sprache ein Host Eintrag existiert
              */
             if (isset($_SERVER['HTTP_HOST'])
                 && isset($vhosts[$_SERVER['HTTP_HOST']])
-                && isset($vhosts[$_SERVER['HTTP_HOST']][$this->lang])
+                && isset($vhosts[$_SERVER['HTTP_HOST']][$this->country])
             ) {
-//                $url = $vhosts[$_SERVER['HTTP_HOST']][$this->lang] . URL_DIR;
-//                $url = QUI\Utils\string::replaceDblSlashes($url);
-//                $url = 'http://' . $this->project_prefix . $url;
-
-                if (isset($_SERVER['REQUEST_URI'])
-                    && $_SERVER['REQUEST_URI'] != URL_DIR
-                ) {
+                if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != URL_DIR) {
                     $message = "\n\n===================================\n\n";
                     $message .= 'Rewrite 301 bei der wir nicht wissen wann es kommt. Rewrite.php Zeile 391 ';
                     $message .= "\n";
@@ -636,6 +638,10 @@ class Rewrite
 
             case 'lang':
                 $result = $this->lang;
+                break;
+
+            case 'country':
+                $result = $this->country;
                 break;
         }
 
@@ -776,6 +782,7 @@ class Rewrite
         }
 
         // Vhosts
+        // @todo noch einmal anschauen
         $Project = $this->getProjectByVhost();
 
         if ($Project) {
@@ -793,10 +800,6 @@ class Rewrite
          * If a vhost wasn't found
          */
 
-        // Falls keine Projekt Parameter existieren wird das standard Projekt verwendet
-//        $Config = QUI\Projects\Manager::getConfig();
-//        $config = $Config->toArray();
-
         // wenn standard vhost nicht der gewünschte ist, dann 404
         $host = '';
 
@@ -809,16 +812,6 @@ class Rewrite
 
             return $this->project;
         }
-
-        // Standard Projekt verwenden wenn kein vhost existiert
-//        foreach ( $config as $p => $e )
-//        {
-//            if ( isset( $e['standard']) && $e['standard'] == 1 )
-//            {
-//                $pname = $p;
-//                break;
-//            }
-//        }
 
         try {
             $Project = QUI\Projects\Manager::get();
@@ -840,8 +833,9 @@ class Rewrite
 
         $this->project = $Project;
         $this->lang    = $Project->getLang();
+        $this->country = $Project->getCountryCode();
 
-        QUI::getLocale()->setCurrent($Project->getLang());
+        QUI::getLocale()->setCurrent($Project->getLocaleCode());
 
         return $Project;
     }
@@ -898,10 +892,7 @@ class Rewrite
         if ($Project) {
             $this->project = $Project;
 
-            QUI::getLocale()->setCurrent(
-                $Project->getAttribute('lang')
-            );
-
+            QUI::getLocale()->setCurrent($Project->getLocaleCode());
             return $Project;
         }
 
@@ -1496,7 +1487,7 @@ class Rewrite
 
         foreach ($paths as $path) {
             QUI::getDataBase()->insert($table, array(
-                'id' => $Site->getId(),
+                'id'   => $Site->getId(),
                 'path' => $path
             ));
         }
@@ -1576,6 +1567,9 @@ class Rewrite
      */
     public function getUrlFromSite($params = array(), $getParams = array())
     {
+        $project = '';
+        $country = '';
+
         // Falls ein Objekt übergeben wird
         if (isset($params['site']) && is_object($params['site'])) {
             /* @var $Project QUI\Projects\Project */
@@ -1586,6 +1580,7 @@ class Rewrite
 
             $lang    = $Project->getLang();
             $project = $Project->getName();
+            $country = $Project->getCountryCode();
 
             unset($params['site']);
 
@@ -1602,13 +1597,17 @@ class Rewrite
                 $lang = $params['lang'];
             }
 
+            if (isset($params['country'])) {
+                $country = $params['country'];
+            }
+
             unset($params['project']);
             unset($params['id']);
             unset($params['lang']);
         }
 
         // Wenn nicht alles da ist dann wird ein Exception geworfen
-        if (!isset($id) || !isset($project)) {
+        if (!isset($id) || !isset($project) || empty($project)) {
             throw new QUI\Exception(
                 'Params missing Rewrite::getUrlFromPage'
             );
@@ -1618,12 +1617,17 @@ class Rewrite
             $lang = '';
         }
 
+        // country fallback
+        if (empty($country)) {
+            $country = $lang;
+        }
+
         QUI\Utils\System\File::mkdir(VAR_DIR . 'cache/links');
 
         $link_cache_dir = VAR_DIR . 'cache/links/' . $project . '/';
         QUI\Utils\System\File::mkdir($link_cache_dir);
 
-        $link_cache_file = $link_cache_dir . $id . '_' . $project . '_' . $lang;
+        $link_cache_file = $link_cache_dir . $id . '_' . $project . '_' . $country;
 
         // get params
         if (!empty($getParams)) {
@@ -1638,7 +1642,7 @@ class Rewrite
         } else {
             // Wenn nicht erstellen
             try {
-                $Project = QUI::getProject($project, $lang);
+                $Project = QUI::getProject($project, $country);
                 /* @var $Project \QUI\Projects\Project */
                 $Site = $Project->get((int)$id);
                 /* @var $s \QUI\Projects\Site */
@@ -1684,7 +1688,7 @@ class Rewrite
             && !empty($vhosts[$_SERVER['HTTP_HOST']][$lang])
         ) {
             if (// wenn ein Host eingetragen ist
-                $lang != $Project->getAttribute('lang')
+                $lang != $Project->getLang()
                 || // falls der jetzige host ein anderer ist als der vom link,
                 // dann den host an den link setzen
                 $vhosts[$_SERVER['HTTP_HOST']][$lang] != $_SERVER['HTTP_HOST']

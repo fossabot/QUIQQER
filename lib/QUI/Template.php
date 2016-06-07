@@ -72,11 +72,11 @@ class Template extends QUI\QDOM
 
         // defaults
         $this->setAttributes(array(
-            'mootools' => true,
-            'requirejs' => true,
-            'html5' => true,
+            'mootools'       => true,
+            'requirejs'      => true,
+            'html5'          => true,
             'content-header' => true,
-            'content-body' => true
+            'content-body'   => true
         ));
     }
 
@@ -302,20 +302,20 @@ class Template extends QUI\QDOM
 
         // Zuweisungen
         $Engine->assign(array(
-            'URL_DIR' => URL_DIR,
+            'URL_DIR'     => URL_DIR,
             'URL_BIN_DIR' => URL_BIN_DIR,
             'URL_LIB_DIR' => URL_LIB_DIR,
             'URL_VAR_DIR' => URL_VAR_DIR,
             'URL_OPT_DIR' => URL_OPT_DIR,
             'URL_USR_DIR' => URL_USR_DIR,
-            'User' => $User,
-            'Locale' => $Locale,
-            'L' => $Locale,
-            'Template' => $Template,
-            'Site' => $Site,
-            'Project' => $Project,
-            'Rewrite' => $Rewrite,
-            'lastUpdate' => QUI::getPackageManager()->getLastUpdateDate()
+            'User'        => $User,
+            'Locale'      => $Locale,
+            'L'           => $Locale,
+            'Template'    => $Template,
+            'Site'        => $Site,
+            'Project'     => $Project,
+            'Rewrite'     => $Rewrite,
+            'lastUpdate'  => QUI::getPackageManager()->getLastUpdateDate()
         ));
 
         /**
@@ -359,7 +359,7 @@ class Template extends QUI\QDOM
 
             $Engine->assign(array(
                 'URL_TPL_DIR' => URL_OPT_DIR . $projectTemplate . '/',
-                'TPL_DIR' => OPT_DIR . $projectTemplate . '/',
+                'TPL_DIR'     => OPT_DIR . $projectTemplate . '/',
             ));
         }
 
@@ -367,8 +367,8 @@ class Template extends QUI\QDOM
             $tpl = $project_tpl;
 
             $Engine->assign(array(
-                'URL_TPL_DIR' => URL_USR_DIR . $Project->getAttribute('name') . '/',
-                'TPL_DIR' => USR_DIR . $Project->getAttribute('name') . '/',
+                'URL_TPL_DIR' => URL_USR_DIR . $Project->getName() . '/',
+                'TPL_DIR'     => USR_DIR . $Project->getName() . '/',
             ));
         }
 
@@ -573,15 +573,15 @@ class Template extends QUI\QDOM
 
         // assign
         $Engine->assign(array(
-            'Project' => $Project,
-            'Site' => $Site,
-            'Engine' => $Engine,
-            'localeFiles' => $locales,
+            'Project'         => $Project,
+            'Site'            => $Site,
+            'Engine'          => $Engine,
+            'localeFiles'     => $locales,
             'loadModuleFiles' => $this->onLoadModules,
-            'headerExtend' => $headerExtend,
-            'ControlManager' => new QUI\Control\Manager(),
-            'Canonical' => new QUI\Projects\Site\Canonical($Site),
-            'lastUpdate' => QUI::getPackageManager()->getLastUpdateDate()
+            'headerExtend'    => $headerExtend,
+            'ControlManager'  => new QUI\Control\Manager(),
+            'Canonical'       => new QUI\Projects\Site\Canonical($Site),
+            'lastUpdate'      => QUI::getPackageManager()->getLastUpdateDate()
         ));
 
         return $Engine->fetch(LIB_DIR . 'templates/header.html');

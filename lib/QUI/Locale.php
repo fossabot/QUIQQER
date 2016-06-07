@@ -33,7 +33,7 @@ class Locale
      *
      * @var string
      */
-    protected $current = 'en';
+    protected $current = 'en_EN';
 
     /**
      * the exist langs
@@ -87,7 +87,27 @@ class Locale
      */
     public function setCurrent($lang)
     {
+        if (strlen($lang) == 2) {
+            $this->setCurrentByCountry($lang);
+        }
+
         $this->current = $lang;
+    }
+
+    /**
+     * @param string $country - en, de, EN, DE
+     */
+    public function setCurrentByCountry($country)
+    {
+        try {
+            $Country = Countries\Manager::get($country);
+            $lang    = $Country->getLang();
+
+            $this->current = $lang;
+
+        } catch (QUI\Exception $Exception) {
+        }
+
     }
 
     /**
@@ -101,17 +121,34 @@ class Locale
     }
 
     /**
+     * Format a number
+     *
      * @param $number
+     * @return string
      */
     public function formatNumber($number)
     {
-        $Formater = new \NumberFormatter();
+        return $this->getNumberFormatter()->format($number);
+    }
 
+    /**
+     * Return a decimal number formater
+     *
+     * @return \NumberFormatter
+     */
+    public function getNumberFormatter()
+    {
+        $current = $this->getCurrent();
+        $current = str_replace('_', '-', $current);
 
-//  "numbering_system": "latn",
-//	"decimal_pattern": "#,##0.###",
-//	"percent_pattern": "#,##0%",
+        $Formater = new \NumberFormatter($current, \NumberFormatter::DECIMAL);
+        $Formater->setPattern($this->get('quiqqer/quiqqer', 'numberFormat.decimal_pattern'));
 
+//        $decimalPattern  = $this->get('quiqqer/quiqqer', 'numberFormat.decimal_pattern');
+//        $percentPattern  = $this->get('quiqqer/quiqqer', 'numberFormat.percent_pattern');
+//        $numberingSystem = $this->get('quiqqer/quiqqer', 'numberFormat.numbering_system');
+
+        return $Formater;
     }
 
     /**

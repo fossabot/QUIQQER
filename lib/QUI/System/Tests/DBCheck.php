@@ -44,7 +44,7 @@ class DBCheck extends QUI\System\Test
         parent::__construct();
 
         $this->setAttributes(array(
-            'title' => 'QUIQQER - Database Check (on failure check error log!)',
+            'title'       => 'QUIQQER - Database Check (on failure check error log!)',
             'description' => 'Compares existing QUIQQER database tables ' .
                              'with database.xml files and detects discrepancies.'
         ));
@@ -155,7 +155,7 @@ class DBCheck extends QUI\System\Test
             if (!empty($langTables)) {
                 foreach ($projects as $Project) {
                     /* @var $Project \QUI\Projects\Project */
-                    $langs = $Project->getAttribute('langs');
+                    $langs = $Project->getLanguages();
 
                     foreach ($langs as $lang) {
                         foreach ($langTables as $tblData) {
@@ -201,9 +201,9 @@ class DBCheck extends QUI\System\Test
     {
         $primaryKeys = array();
         $checkData   = array(
-            'table' => $info['suffix'],
-            'fields' => $info['fields'],
-            'indices' => false,
+            'table'    => $info['suffix'],
+            'fields'   => $info['fields'],
+            'indices'  => false,
             'auto_inc' => false
         );
 
@@ -465,9 +465,9 @@ class DBCheck extends QUI\System\Test
     protected function addError($table, $dbTable, $error)
     {
         $this->errors[] = array(
-            'table' => $table,
+            'table'   => $table,
             'dbTable' => $dbTable,
-            'error' => $error
+            'error'   => $error
         );
 
         $this->error = true;

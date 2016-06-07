@@ -86,8 +86,8 @@ class Edit extends Site
         $id = $this->getId();
 
         $this->lockfile = VAR_DIR . 'lock/' .
-                          $Project->getAttribute('name') . '_' .
-                          $id . '_' . $Project->getAttribute('lang');
+                          $Project->getName() . '_' .
+                          $id . '_' . $Project->getLang();
 
         // Temp Dir abfragen ob existiert
         QUI\Utils\System\File::mkdir(VAR_DIR . 'admin/');
@@ -858,7 +858,7 @@ class Edit extends Site
 
 
         $Project = $this->getProject();
-        $p_lang  = $Project->getAttribute('lang');
+        $p_lang  = $Project->getLang();
 
         $id = (int)$id;
 
@@ -910,7 +910,7 @@ class Edit extends Site
                 $lang => 0
             ),
             'where'  => array(
-                $Project->getAttribute('lang') => $this->getId()
+                $Project->getLang() => $this->getId()
             )
         ));
     }
@@ -1171,8 +1171,8 @@ class Edit extends Site
     {
         $Project = $this->getProject();
 
-        $table = $Project->getAttribute('name') . '_' .
-                 $Project->getAttribute('lang') . '_sites_relations';
+        $table = $Project->getName() . '_' .
+                 $Project->getLang() . '_sites_relations';
 
         $Parent = $this->getParent();
 
@@ -1228,8 +1228,8 @@ class Edit extends Site
         $Parent   = $this->getParent();
         $DataBase = QUI::getDataBase();
 
-        $table = $Project->getAttribute('name') . '_' .
-                 $Project->getAttribute('lang') . '_sites_relations';
+        $table = $Project->getName() . '_' .
+                 $Project->getLang() . '_sites_relations';
 
         if (QUI\Utils\BoolHelper::JSBool($all)) {
             // Seite löschen
@@ -1271,12 +1271,8 @@ class Edit extends Site
         // Link Cache löschen
         $Project = $this->getProject();
 
-        $link_cache_dir
-            = VAR_DIR . 'cache/links/' . $Project->getAttribute('name') . '/';
-
-        $link_cache_file
-            = $link_cache_dir . $this->getId() . '_' . $Project->getAttribute('name')
-              . '_' . $Project->getAttribute('lang');
+        $link_cache_dir  = VAR_DIR . 'cache/links/' . $Project->getName() . '/';
+        $link_cache_file = $link_cache_dir . $this->getId() . '_' . $Project->getName() . '_' . $Project->getLang();
 
         if (file_exists($link_cache_file)) {
             unlink($link_cache_file);
@@ -1297,12 +1293,11 @@ class Edit extends Site
         // Link Cache
         $Project = $this->getProject();
 
-        $link_cache_dir = VAR_DIR . 'cache/links/' .
-                          $Project->getAttribute('name') . '/';
+        $link_cache_dir = VAR_DIR . 'cache/links/' . $Project->getName() . '/';
 
         $link_cache_file = $link_cache_dir . $this->getId() . '_' .
-                           $Project->getAttribute('name') . '_' .
-                           $Project->getAttribute('lang');
+                           $Project->getName() . '_' .
+                           $Project->getLang();
 
         QUI\Utils\System\File::mkdir($link_cache_dir);
 

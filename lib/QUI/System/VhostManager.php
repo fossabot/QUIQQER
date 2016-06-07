@@ -67,8 +67,8 @@ class VhostManager
             }
 
             try {
-                $Project = \QUI::getProject($data['project']);
-                $langs   = $Project->getAttribute('langs');
+                $Project = QUI::getProject($data['project']);
+                $langs   = $Project->getLanguages();
 
             } catch (QUI\Exception $Exception) {
                 QUI::getMessagesHandler()->addError($Exception->getMessage());
@@ -171,7 +171,7 @@ class VhostManager
 
         // lang hosts
         $Project      = QUI::getProject($result['project']);
-        $projectLangs = $Project->getAttribute('langs');
+        $projectLangs = $Project->getLanguages();
         $lang         = $result['lang'];
 
         foreach ($projectLangs as $projectLang) {

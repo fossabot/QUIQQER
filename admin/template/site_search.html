@@ -18,8 +18,8 @@
 			style="float: left; margin-top: 2px;"
 			onchange="_pcsg.SiteSearch.showProjectLang(this)">
 			{foreach from=$projects item=Project}
-			<option value="{$Project->getAttribute('name')}">
-				{$Project->getAttribute('name')}
+			<option value="{$Project->getName()}">
+				{$Project->getName()}
 			</option>
 			{/foreach}
 		</select>
@@ -31,8 +31,8 @@
 
 		{strip}
 		{foreach from=$projects item=Project}
-			{assign var=langs value=$Project->getAttribute('langs')}
-		<div id="search_window_{$Project->getAttribute('name')}_langs" style="display: none">
+			{assign var=langs value=$Project->getLanguages()}
+		<div id="search_window_{$Project->getName()}_langs" style="display: none">
 			{foreach from=$langs item=lang}
 				{$lang},
 			{/foreach}

@@ -109,15 +109,15 @@ try {
         $Smarty = QUI::getTemplateManager()->getEngine();
 
         $Smarty->assign(array(
-            'Project' => $Project,
-            'URL_DIR' => URL_DIR,
+            'Project'     => $Project,
+            'URL_DIR'     => URL_DIR,
             'URL_BIN_DIR' => URL_BIN_DIR,
             'URL_LIB_DIR' => URL_LIB_DIR,
             'URL_VAR_DIR' => URL_VAR_DIR,
             'URL_OPT_DIR' => URL_OPT_DIR,
             'URL_USR_DIR' => URL_USR_DIR,
             'URL_TPL_DIR' => URL_USR_DIR . $Project->getName() . '/',
-            'TPL_DIR' => OPT_DIR . $Project->getName() . '/',
+            'TPL_DIR'     => OPT_DIR . $Project->getName() . '/',
         ));
 
         $file  = LIB_DIR . 'templates/maintenance.html';
@@ -135,10 +135,10 @@ try {
 
     // Prüfen ob es ein Cachefile gibt damit alles andere übersprungen werden kann
     $site_cache_dir    = VAR_DIR . 'cache/sites/';
-    $project_cache_dir = $site_cache_dir . $Project->getAttribute('name') . '/';
+    $project_cache_dir = $site_cache_dir . $Project->getName() . '/';
     $site_cache_file   = $project_cache_dir . $Site->getId() . '_'
-                         . $Project->getAttribute('name') . '_'
-                         . $Project->getAttribute('lang');
+                         . $Project->getName() . '_'
+                         . $Project->getLang();
 
     $site_cache_file .= '_' . md5(QUI::getRequest()->getRequestUri());
 
@@ -183,7 +183,7 @@ try {
             && !QUI::getUsers()->isAuth(QUI::getUserBySession())
         ) {
             QUI\Utils\System\File::mkdir(
-                $site_cache_dir . $Project->getAttribute('name') . '/'
+                $site_cache_dir . $Project->getName() . '/'
             );
 
             file_put_contents($site_cache_file, $content);

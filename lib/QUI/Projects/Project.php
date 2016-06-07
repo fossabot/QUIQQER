@@ -73,6 +73,21 @@ class Project
     private $lang;
 
     /**
+     * @var string
+     */
+    private $locale = null;
+
+    /**
+     * @var
+     */
+    private $country = null;
+
+    /**
+     * @var QUI\Countries\Country|null
+     */
+    private $Country = null;
+
+    /**
      * default language
      *
      * @var string
@@ -185,6 +200,14 @@ class Project
 
         if (isset($this->config['layout'])) {
             $this->layout = $this->config['layout'];
+        }
+
+        if (isset($this->config['country'])) {
+            $this->country = $this->config['country'];
+        }
+
+        if (isset($this->config['locale'])) {
+            $this->locale = $this->config['locale'];
         }
 
         // Sprache
@@ -305,8 +328,10 @@ class Project
     public function toArray()
     {
         return array(
-            'name' => $this->getAttribute('name'),
-            'lang' => $this->getAttribute('lang')
+            'name'    => $this->getName(),
+            'lang'    => $this->getLang(),
+            'country' => $this->getCountry()->getCode(),
+            'locale'  => $this->getLocaleCode()
         );
     }
 
@@ -323,7 +348,7 @@ class Project
     /**
      * Return the project lang
      *
-     * @return string
+     * @return string - en, de
      */
     public function getLang()
     {
@@ -337,13 +362,76 @@ class Project
      */
     public function getLanguages()
     {
-        $langs = $this->getAttribute('langs');
-
-        if (is_string($langs)) {
-            $langs = explode(',', $langs);
+        if (is_string($this->langs)) {
+            $this->langs = explode(',', $this->langs);
         }
 
-        return $langs;
+        return $this->langs;
+    }
+
+    /**
+     * Return the project locale code
+     *
+     * @return string
+     */
+    public function getLocaleCode()
+    {
+        if (!is_null($this->locale)) {
+            return $this->locale;
+        }
+
+        return $this->getCountry()->getLocaleCode();
+    }
+
+    /**
+     * Return the project country
+     *
+     * @return null|QUI\Countries\Country
+     */
+    public function getCountry()
+    {
+        if (!is_null($this->Country)) {
+            return $this->Country;
+        }
+
+        // country lang fallback für alte quiqqer version
+        if (!$this->country) {
+            switch ($this->lang) {
+                case 'en':
+                    $this->country = 'US';
+                    break;
+
+                default:
+                    $this->country = $this->lang;
+            }
+        }
+
+        try {
+            $this->Country = QUI\Countries\Manager::get($this->country);
+        } catch (QUI\Exception $Exception) {
+        }
+
+        return $this->Country;
+    }
+
+    /**
+     * Return the country code
+     *
+     * @return string
+     */
+    public function getCountryCode()
+    {
+        $Country = $this->getCountry();
+
+        if (!is_null($Country)) {
+            return $Country->getCode();
+        }
+
+        if (!is_null($this->country)) {
+            return $this->country;
+        }
+
+        return 'US';
     }
 
     /**
@@ -470,49 +558,33 @@ class Project
         switch ($att) {
             case "name":
                 return $this->getName();
-                break;
 
             case "lang":
                 return $this->getLang();
-                break;
+
+            case "langs":
+                return $this->getLanguages();
 
             case "e_date":
                 return $this->getLastEditDate();
-                break;
 
             case "config":
                 return $this->config;
-                break;
 
             case "default_lang":
                 return $this->default_lang;
-                break;
-
-            case "langs":
-                return $this->langs;
-                break;
 
             case "template":
                 return $this->template;
-                break;
 
             case "layout":
                 return $this->layout;
-                break;
 
             case "db_table":
-                # Anzeigen demo_de_sites
-                return $this->name . '_' . $this->lang . '_sites';
-                break;
-
-            case "media_table":
-                # Anzeigen demo_de_sites
-                return $this->name . '_de_media';
-                break;
+                return $this->name . '_' . $this->getLang() . '_sites';
 
             default:
                 return false;
-                break;
         }
     }
 
@@ -590,9 +662,9 @@ class Project
     {
         return array(
             'config'  => $this->config,
-            'lang'    => $this->lang,
-            'langs'   => $this->langs,
-            'name'    => $this->name,
+            'lang'    => $this->getLang(),
+            'langs'   => $this->getLanguages(),
+            'name'    => $this->getName(),
             'sheets'  => $this->getConfig('sheets'),
             'archive' => $this->getConfig('archive')
         );

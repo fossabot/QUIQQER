@@ -205,11 +205,11 @@ abstract class Item extends QUI\QDOM
         QUI::getDataBase()->update(
             $this->Media->getTable(),
             array(
-                'title' => $this->getAttribute('title'),
-                'alt' => $this->getAttribute('alt'),
-                'short' => $this->getAttribute('short'),
-                'order' => $order,
-                'priority' => (int)$this->getAttribute('priority'),
+                'title'         => $this->getAttribute('title'),
+                'alt'           => $this->getAttribute('alt'),
+                'short'         => $this->getAttribute('short'),
+                'order'         => $order,
+                'priority'      => (int)$this->getAttribute('priority'),
                 'image_effects' => json_encode($image_effects)
             ),
             array(
@@ -312,8 +312,8 @@ abstract class Item extends QUI\QDOM
             $this->Media->getTable(),
             array(
                 'deleted' => 1,
-                'active' => 0,
-                'file' => ''
+                'active'  => 0,
+                'file'    => ''
             ),
             array(
                 'id' => $this->getId()
@@ -602,8 +602,7 @@ abstract class Item extends QUI\QDOM
         if ($rewrite == false) {
             $Project = $this->Media->getProject();
 
-            $str = 'image.php?id=' . $this->getId() . '&project='
-                   . $Project->getAttribute('name');
+            $str = 'image.php?id=' . $this->getId() . '&project=' . $Project->getName();
 
             if ($this->getAttribute('maxheight')) {
                 $str .= '&maxheight=' . $this->getAttribute('maxheight');
@@ -617,8 +616,7 @@ abstract class Item extends QUI\QDOM
         }
 
         if ($this->getAttribute('active') == 1) {
-            return URL_DIR . $this->Media->getCacheDir()
-                   . $this->getAttribute('file');
+            return URL_DIR . $this->Media->getCacheDir() . $this->getAttribute('file');
         }
 
         return '';
@@ -682,7 +680,7 @@ abstract class Item extends QUI\QDOM
             ),
             array(
                 'parent' => $Parent->getId(),
-                'child' => $this->getId()
+                'child'  => $this->getId()
             )
         );
 

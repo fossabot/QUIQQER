@@ -578,8 +578,7 @@ class QUI
             return QUI_DB_PRFX . $Project->getName() . '_' . $table;
         }
 
-        return QUI_DB_PRFX . $Project->getName() . '_' . $Project->getLang() . '_'
-               . $table;
+        return QUI_DB_PRFX . $Project->getName() . '_' . $Project->getLang() . '_' . $table;
     }
 
     /**
@@ -699,20 +698,24 @@ class QUI
      * You can also use \QUI\Projects\Manager::getProject()
      *
      * @param string|array $project - Project name | array('name' => , 'lang' => , 'template' => )
-     * @param string|boolean $lang - Project lang (optional)
+     * @param string|boolean $country - Project country (optional)
      * @param string|boolean $template - Project template (optional)
      *
      * @return \QUI\Projects\Project
      * @uses \QUI\Projects\Manager
      */
-    public static function getProject($project, $lang = false, $template = false)
+    public static function getProject($project, $country = false, $template = false)
     {
         if (is_array($project)) {
-            $lang     = false;
+            $country  = false;
             $template = false;
 
             if (isset($project['lang'])) {
-                $lang = $project['lang'];
+                $country = $project['lang'];
+            }
+
+            if (isset($project['country'])) {
+                $country = $project['country'];
             }
 
             if (isset($project['template'])) {
@@ -724,7 +727,7 @@ class QUI
             }
         }
 
-        return \QUI\Projects\Manager::getProject($project, $lang, $template);
+        return QUI\Projects\Manager::getProject($project, $country, $template);
     }
 
     /**
