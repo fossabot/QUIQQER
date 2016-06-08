@@ -88,26 +88,27 @@ class Locale
     public function setCurrent($lang)
     {
         if (strlen($lang) == 2) {
-            $this->setCurrentByCountry($lang);
+            try {
+                $this->setCurrentByCountry($lang);
+            } catch (QUI\Exception $Exception) {
+                $this->current = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
+            }
+
+            return;
         }
 
         $this->current = $lang;
     }
 
     /**
+     * Set the current language by a country code
+     *
      * @param string $country - en, de, EN, DE
+     * @throws QUI\Exception
      */
     public function setCurrentByCountry($country)
     {
-        try {
-            $Country = Countries\Manager::get($country);
-            $lang    = $Country->getLang();
-
-            $this->current = $lang;
-
-        } catch (QUI\Exception $Exception) {
-        }
-
+        $this->current = Countries\Manager::get($country)->getLocaleCode();
     }
 
     /**
@@ -478,7 +479,6 @@ class Locale
             return false;
         }
 
-
         $Gettext = new QUI\Utils\Translation\GetText(
             $current,
             $group,
@@ -539,12 +539,13 @@ class Locale
      */
     public function getTranslationFile($lang, $group)
     {
-        $locale = QUI\Utils\StringHelper::toLower($lang) . '_'
-                  . QUI\Utils\StringHelper::toUpper($lang);
+        if (strlen($lang) === 2) {
+            $lang = mb_strtolower($lang) . '_' . mb_strtolower($lang);
+        }
 
         $group = str_replace('/', '_', $group);
 
-        return $this->dir() . '/' . $locale . '/LC_MESSAGES/' . $group . '.ini.php';
+        return $this->dir() . '/' . $lang . '/LC_MESSAGES/' . $group . '.ini.php';
     }
 
     /**

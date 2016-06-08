@@ -113,10 +113,11 @@ try {
     <script type="text/javascript">
         /* <![CDATA[ */
         var USER = {
-            isSU: <?php echo $User->isSU() ? 1 : 0; ?>,
-            id  : <?php echo $User->getId() ? $User->getId() : 0; ?>,
-            lang: "<?php echo $User->getLang(); ?>",
-            name: "<?php echo $User->getName(); ?>"
+            isSU  : <?php echo $User->isSU() ? 1 : 0; ?>,
+            id    : <?php echo $User->getId() ? $User->getId() : 0; ?>,
+            lang  : "<?php echo $User->getLang(); ?>",
+            name  : "<?php echo $User->getName(); ?>",
+            locale: "<?php echo $User->getLocale()->getCurrent(); ?>"
         };
 
         var URL_DIR = "<?php echo URL_DIR; ?>",
@@ -128,24 +129,25 @@ try {
             URL_VAR_DIR = "<?php echo URL_VAR_DIR; ?>";
 
         var PHP = {
-            upload_max_filesize: "<?php echo \QUI\Utils\System::getUploadMaxFileSize(); ?>"
+            upload_max_filesize: "<?php echo QUI\Utils\System::getUploadMaxFileSize(); ?>"
         };
 
-        var QUIQQER_VERSION = "<?php echo \QUI::version() ?>";
+        var QUIQQER_VERSION = "<?php echo QUI::version() ?>";
         var QUIQQER_CONFIG = <?php echo json_encode($config); ?>;
 
         // standard project
         var QUIQQER_PROJECT = <?php echo json_encode(array(
-            'name' => $Project ? $Project->getName() : '',
-            'lang' => $Project ? $Project->getLang() : ''
+            'name'    => $Project ? $Project->getName() : '',
+            'lang'    => $Project ? $Project->getLang() : '',
+            'country' => $Project ? $Project->getCountryCode() : '',
         )); ?>;
 
         var QUIQQER = {
             Rewrite         : {
-                URL_PARAM_SEPERATOR  : "<?php echo \QUI\Rewrite::URL_PARAM_SEPERATOR; ?>",
-                URL_SPACE_CHARACTER  : "<?php echo \QUI\Rewrite::URL_SPACE_CHARACTER; ?>",
-                URL_PROJECT_CHARACTER: "<?php echo \QUI\Rewrite::URL_PROJECT_CHARACTER; ?>",
-                SUFFIX               : "<?php echo \QUI\Rewrite::getDefaultSuffix(); ?>"
+                URL_PARAM_SEPERATOR  : "<?php echo QUI\Rewrite::URL_PARAM_SEPERATOR; ?>",
+                URL_SPACE_CHARACTER  : "<?php echo QUI\Rewrite::URL_SPACE_CHARACTER; ?>",
+                URL_PROJECT_CHARACTER: "<?php echo QUI\Rewrite::URL_PROJECT_CHARACTER; ?>",
+                SUFFIX               : "<?php echo QUI\Rewrite::getDefaultSuffix(); ?>"
             },
             inAdministration: true,
             lu              : "<?php echo QUI::getPackageManager()->getLastUpdateDate(); ?>"
@@ -162,15 +164,13 @@ try {
     $files = array();
 
     try {
-        $files = \QUI\Translator::getJSTranslationFiles($User->getLang());
+        $files = QUI\Translator::getJSTranslationFiles($User->getLang());
 
-    } catch (\QUI\Exception $Exception) {
+    } catch (QUI\Exception $Exception) {
     }
 
-    $locales = array();
-
     foreach ($files as $package => $file) {
-        $locales[] = $package . '/' . $User->getLang();
+        $locales[] = $package . '/' . $User->getLocale()->getCurrent();
     }
 
     echo '<script type="text/javascript">';
@@ -179,7 +179,7 @@ try {
     echo '/* ]]> */';
     echo '</script>';
 
-    \QUI::getEvents()->fireEvent('adminLoad');
+    QUI::getEvents()->fireEvent('adminLoad');
     ?>
 
 </head>

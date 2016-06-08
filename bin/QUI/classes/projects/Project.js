@@ -83,6 +83,7 @@ define('classes/projects/Project', [
             return JSON.encode({
                 name    : this.getName(),
                 lang    : this.getLang(),
+                country : this.getCountry(),
                 template: template
             });
         },
@@ -208,9 +209,7 @@ define('classes/projects/Project', [
          * @return Promise
          */
         setConfig: function (params, callback) {
-
             var self = this;
-
             return new Promise(function (resolve, reject) {
 
                 Ajax.post('ajax_project_set_config', function (result) {
@@ -279,6 +278,16 @@ define('classes/projects/Project', [
          */
         getLang: function () {
             return this.getAttribute('lang');
+        },
+
+        /**
+         * Return the Project country
+         *
+         * @method classes/projects/Project#getCountry
+         * @return {String}
+         */
+        getCountry: function () {
+            return this.getAttribute('country');
         },
 
         /**

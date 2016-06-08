@@ -181,7 +181,7 @@ class User implements QUI\Interfaces\Users\User
     public function refresh()
     {
         $data = QUI::getDataBase()->fetch(array(
-            'from' => Manager::table(),
+            'from'  => Manager::table(),
             'where' => array(
                 'id' => $this->id
             ),
@@ -392,8 +392,7 @@ class User implements QUI\Interfaces\Users\User
         // falls null, dann vom Projekt
         if (!$this->lang) {
             try {
-                $this->lang = QUI\Projects\Manager::get()
-                    ->getAttribute('lang');
+                $this->lang = QUI\Projects\Manager::get()->getLang();
 
             } catch (QUI\Exception $Exception) {
             }
@@ -997,7 +996,7 @@ class User implements QUI\Interfaces\Users\User
 
         } catch (QUI\Exception $Exception) {
             QUI\System\Log::addError($Exception->getMessage(), array(
-                'UserId' => $this->getId(),
+                'UserId'        => $this->getId(),
                 'ExceptionType' => $Exception->getType()
             ));
         }
@@ -1049,22 +1048,22 @@ class User implements QUI\Interfaces\Users\User
         QUI::getDataBase()->update(
             Manager::table(),
             array(
-                'username' => '',
-                'active' => -1,
-                'password' => '',
-                'usergroup' => '',
-                'firstname' => '',
-                'lastname' => '',
-                'usertitle' => '',
-                'birthday' => '',
-                'email' => '',
-                'su' => 0,
-                'avatar' => '',
-                'extra' => '',
-                'lang' => '',
-                'shortcuts' => '',
+                'username'   => '',
+                'active'     => -1,
+                'password'   => '',
+                'usergroup'  => '',
+                'firstname'  => '',
+                'lastname'   => '',
+                'usertitle'  => '',
+                'birthday'   => '',
+                'email'      => '',
+                'su'         => 0,
+                'avatar'     => '',
+                'extra'      => '',
+                'lang'       => '',
+                'shortcuts'  => '',
                 'activation' => '',
-                'expire' => '0000-00-00 00:00:00'
+                'expire'     => '0000-00-00 00:00:00'
             ),
             array('id' => $this->getId())
         );
@@ -1131,22 +1130,22 @@ class User implements QUI\Interfaces\Users\User
         return QUI::getDataBase()->update(
             Manager::table(),
             array(
-                'username' => $this->getUsername(),
+                'username'  => $this->getUsername(),
                 'usergroup' => ',' . implode(',', $this->getGroups(false)) . ',',
                 'firstname' => $this->getAttribute('firstname'),
-                'lastname' => $this->getAttribute('lastname'),
+                'lastname'  => $this->getAttribute('lastname'),
                 'usertitle' => $this->getAttribute('usertitle'),
-                'birthday' => $birthday,
-                'email' => $this->getAttribute('email'),
-                'avatar' => $this->getAvatar(),
-                'su' => $this->isSU(),
-                'extra' => json_encode($extra),
-                'lang' => $this->getAttribute('lang'),
-                'lastedit' => date("Y-m-d H:i:s"),
-                'expire' => $expire,
+                'birthday'  => $birthday,
+                'email'     => $this->getAttribute('email'),
+                'avatar'    => $this->getAvatar(),
+                'su'        => $this->isSU(),
+                'extra'     => json_encode($extra),
+                'lang'      => $this->getAttribute('lang'),
+                'lastedit'  => date("Y-m-d H:i:s"),
+                'expire'    => $expire,
                 'shortcuts' => $this->getAttribute('shortcuts'),
-                'address' => (int)$this->getAttribute('address'),
-                'company' => $this->isCompany() ? 1 : 0
+                'address'   => (int)$this->getAttribute('address'),
+                'company'   => $this->isCompany() ? 1 : 0
             ),
             array('id' => $this->getId())
         );
@@ -1461,9 +1460,9 @@ class User implements QUI\Interfaces\Users\User
     public function getAddressList()
     {
         $result = QUI::getDataBase()->fetch(array(
-            'from' => Manager::tableAddress(),
+            'from'   => Manager::tableAddress(),
             'select' => 'id',
-            'where' => array(
+            'where'  => array(
                 'uid' => $this->getId()
             )
         ));
@@ -1542,7 +1541,7 @@ class User implements QUI\Interfaces\Users\User
             $suUsers = QUI::getUsers()->getUserIds(array(
                 'where' => array(
                     'active' => 1,
-                    'su' => 1
+                    'su'     => 1
                 )
             ));
 

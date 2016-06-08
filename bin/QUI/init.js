@@ -89,7 +89,7 @@ require(requireList, function () {
         QUIContextmenuItem      = arguments[7],
         QUIContextmenuSeperator = arguments[8];
 
-    Locale.setCurrent(USER.lang);
+    Locale.setCurrent(USER.locale);
 
     QUI.setAttributes({
         'control-loader-type' : 'line-scale',
@@ -176,7 +176,7 @@ require(requireList, function () {
                             var Quiqqer = Bar.getChildren('quiqqer');
 
                             if (Quiqqer) {
-                                var Img = Quiqqer.getElm().getElement('img');
+                                var Img = Quiqqer.getElm().getElements('img');
 
                                 Img.setStyles({
                                     height  : 22,

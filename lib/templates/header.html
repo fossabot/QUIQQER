@@ -70,6 +70,7 @@
         var QUIQQER_PROJECT = {
             name : '{$Project->getName()}',
             lang : '{$Project->getLang()}',
+            country : '{$Project->getCountryCode()}',
             httpshost : {if strpos( $httpshost, 'https' ) !== false}'{$httpshost}'{else}false{/if}
         };
 

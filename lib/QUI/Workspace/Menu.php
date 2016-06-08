@@ -245,10 +245,13 @@ class Menu
 
         /* @var $Title \DOMElement */
         if ($Title) {
-            $MenuItem->setAttribute(
-                'text',
-                QUI\Utils\DOM::getTextFromNode($Title)
+            $text = QUI\Utils\DOM::getTextFromNode(
+                $Title,
+                true,
+                QUI::getUserBySession()->getLocale()
             );
+
+            $MenuItem->setAttribute('text', $text);
         }
     }
 

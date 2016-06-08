@@ -589,11 +589,12 @@ class DOM
      * if no <locale exist, it return the nodeValue
      *
      * @param \DOMNode|\DOMElement $Node
-     * @param boolean $translate - direct translation? default = true
+     * @param boolean $translate - optional, direct translation? default = true
+     * @param null|QUI\Locale $Locale - optional, Locale object
      *
      * @return string|array
      */
-    public static function getTextFromNode(\DOMNode $Node, $translate = true)
+    public static function getTextFromNode(\DOMNode $Node, $translate = true, $Locale = null)
     {
         $loc = $Node->getElementsByTagName('locale');
 
@@ -611,7 +612,11 @@ class DOM
             );
         }
 
-        return QUI::getLocale()->get(
+        if (is_null($Locale)) {
+            $Locale = QUI::getLocale();
+        }
+
+        return $Locale->get(
             $Element->getAttribute('group'),
             $Element->getAttribute('var')
         );
