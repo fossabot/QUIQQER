@@ -494,7 +494,7 @@ class QUI
         $langs = QUI\Translator::langs();
 
         if (empty($langs)) {
-            $langs = array('en');
+            $langs = array('en_EN');
         }
 
         return $langs;

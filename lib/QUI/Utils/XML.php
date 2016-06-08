@@ -41,11 +41,11 @@ class XML
             }
 
             $params = array(
-                'text' => DOM::getTextFromNode($Item),
-                'name' => $Item->getAttribute('name'),
-                'icon' => DOM::parseVar($Item->getAttribute('icon')),
+                'text'    => DOM::getTextFromNode($Item),
+                'name'    => $Item->getAttribute('name'),
+                'icon'    => DOM::parseVar($Item->getAttribute('icon')),
                 'require' => $Item->getAttribute('require'),
-                'exec' => $Item->getAttribute('exec'),
+                'exec'    => $Item->getAttribute('exec'),
                 'onClick' => 'QUI.Menu.menuClick'
             );
 
@@ -273,23 +273,24 @@ class XML
         $Database = $database->item(0);
 
         /* @var $Database \DOMElement */
-        $global  = $Database->getElementsByTagName('global');
+        $globals = $Database->getElementsByTagName('global');
         $project = $Database->getElementsByTagName('projects');
 
         // global
-        if ($global && $global->length) {
-            /* @var $Table \DOMElement */
-            $Table  = $global->item(0);
-            $tables = $Table->getElementsByTagName('table');
+        if ($globals && $globals->length) {
+            foreach ($globals as $Table) {
+                /* @var $Table \DOMElement */
+                $tables = $Table->getElementsByTagName('table');
 
-            for ($i = 0; $i < $tables->length; $i++) {
-                $dbfields['globals'][] = DOM::dbTableDomToArray(
-                    $tables->item($i)
-                );
-            }
+                for ($i = 0; $i < $tables->length; $i++) {
+                    $dbfields['globals'][] = DOM::dbTableDomToArray(
+                        $tables->item($i)
+                    );
+                }
 
-            if ($Table->getAttribute('execute')) {
-                $dbfields['execute'][] = $Table->getAttribute('execute');
+                if ($Table->getAttribute('execute')) {
+                    $dbfields['execute'][] = $Table->getAttribute('execute');
+                }
             }
         }
 
@@ -386,7 +387,7 @@ class XML
             foreach ($events as $Event) {
                 /* @var $Event \DOMElement */
                 $result[] = array(
-                    'on' => $Event->getAttribute('on'),
+                    'on'   => $Event->getAttribute('on'),
                     'fire' => $Event->getAttribute('fire'),
                     'type' => $package . ':' . $Type->getAttribute('type')
                 );
@@ -482,8 +483,8 @@ class XML
             $localelist = $Group->getElementsByTagName('locale');
 
             $locales = array(
-                'group' => $Group->getAttribute('name'),
-                'locales' => array(),
+                'group'    => $Group->getAttribute('name'),
+                'locales'  => array(),
                 'datatype' => $Group->getAttribute('datatype')
             );
 
@@ -516,6 +517,45 @@ class XML
             }
 
             $result[] = $locales;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return locale files in the DOMDocument
+     *
+     * @param string $file - file path
+     * @return array
+     */
+    public static function getLocaleFilesFromXml($file)
+    {
+        if (!file_exists($file)) {
+            return array();
+        }
+
+        $Path   = new \DOMXPath(self::getDomFromXml($file));
+        $files  = $Path->query("//locales/file");
+        $result = array();
+
+        $fileDirectory = dirname($file) . '/';
+
+        if (!$files->length) {
+            return $result;
+        }
+
+        /* @var $File \DOMElement */
+        foreach ($files as $File) {
+            $localeFile = $File->getAttribute('src');
+
+            if (file_exists($localeFile)) {
+                $result[] = $localeFile;
+                continue;
+            }
+
+            if (file_exists($fileDirectory . $localeFile)) {
+                $result[] = $fileDirectory . $localeFile;
+            }
         }
 
         return $result;
@@ -1042,7 +1082,7 @@ class XML
                 // typ prüfen
                 switch ($default['type']) {
                     case 'bool':
-                        $value = QUI\Utils\Bool::JSBool($value);
+                        $value = QUI\Utils\BoolHelper::JSBool($value);
 
                         if ($value) {
                             $value = 1;
@@ -1101,7 +1141,7 @@ class XML
             foreach ($dbfields['globals'] as $table) {
                 $tbl = QUI::getDBTableName($table['suffix']);
 
-                $Table->appendFields($tbl, $table['fields'], $table['engine']);
+                $Table->addColumn($tbl, $table['fields'], $table['engine']);
 
                 if (isset($table['primary'])) {
                     $Table->setPrimaryKey($tbl, $table['primary']);
@@ -1164,7 +1204,7 @@ class XML
                             $tbl = QUI::getDBTableName($name . '_' . $suffix);
                         }
 
-                        $Table->appendFields($tbl, $fields, $engine);
+                        $Table->addColumn($tbl, $fields, $engine);
 
                         if (isset($table['primary'])) {
                             $Table->setPrimaryKey($tbl, $table['primary']);

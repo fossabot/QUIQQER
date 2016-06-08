@@ -330,16 +330,16 @@ define('controls/projects/project/Settings', [
                             Template = Form.elements.template,
                             Langs    = Form.elements.langs,
 
-                            langs    = self.$config.langs.split(',');
+                            langs    = self.$config.langs;
 
                         for (var i = 0, len = langs.length; i < len; i++) {
                             new Element('option', {
-                                html : langs[i],
+                                html : Locale.translateCode(langs[i]),
                                 value: langs[i]
                             }).inject(Standard);
 
                             new Element('option', {
-                                html : langs[i],
+                                html : Locale.translateCode(langs[i]),
                                 value: langs[i]
                             }).inject(Langs);
                         }

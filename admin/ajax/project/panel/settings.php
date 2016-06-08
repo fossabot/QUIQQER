@@ -13,7 +13,7 @@ QUI::$Ajax->registerFunction(
         $Project = QUI::getProjectManager()->decode($project);
 
         $Engine->assign(array(
-            'QUI' => new \QUI(),
+            'QUI'     => new QUI(),
             'Project' => $Project
         ));
 

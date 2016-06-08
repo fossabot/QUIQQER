@@ -41,6 +41,8 @@ class Setup
 
         self::generateFileLinks();
 
+        QUI\Translator::setup();
+
         // mail queue setup
         Mail\Queue::setup();
 

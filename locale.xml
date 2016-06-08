@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <locales>
 
+    <file src="lib/locale/languages.xml"/>
+  
     <groups name="quiqqer/quiqqer" datatype="js,php">
         <locale name="permission.quiqqer._header">
             <de><![CDATA[QUIQQER]]></de>

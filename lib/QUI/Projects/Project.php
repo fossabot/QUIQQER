@@ -147,12 +147,12 @@ class Project
      * Konstruktor eines Projektes
      *
      * @param string $name - Name of the Project
-     * @param string|boolean $lang - (optional) Language of the Project - optional
+     * @param string|boolean $country - (optional) Country of the project - optional
      * @param string|boolean $template - (optional) Template of the Project
      *
      * @throws QUI\Exception
      */
-    public function __construct($name, $lang = false, $template = false)
+    public function __construct($name, $country = false, $template = false)
     {
         $config = Manager::getConfig()->toArray();
         $name   = (string)$name;
@@ -169,8 +169,9 @@ class Project
             );
         }
 
-        $this->config = $config[$name];
-        $this->name   = $name;
+        $this->config  = $config[$name];
+        $this->name    = $name;
+        $this->country = $country;
 
         // Langs
         if (!isset($this->config['langs'])) {
@@ -185,6 +186,13 @@ class Project
 
         $this->langs = explode(',', $this->config['langs']);
 
+        // parse langs to locales
+        foreach ($this->langs as $key => $l) {
+            if (strpos($l, '_') === false) {
+                $this->langs[$key] = QUI::getLocale()->parseLangToLocaleCode($l);
+            }
+        }
+
         // Default Lang
         if (!isset($this->config['default_lang'])) {
             throw new QUI\Exception(
@@ -196,21 +204,23 @@ class Project
             );
         }
 
-        $this->default_lang = $this->config['default_lang'];
+        $this->default_lang = QUI::getLocale()->parseLangToLocaleCode($this->config['default_lang']);
 
         if (isset($this->config['layout'])) {
             $this->layout = $this->config['layout'];
-        }
-
-        if (isset($this->config['country'])) {
-            $this->country = $this->config['country'];
         }
 
         if (isset($this->config['locale'])) {
             $this->locale = $this->config['locale'];
         }
 
+        if ($this->country === false) {
+            $this->country = explode('_', $this->default_lang)[1];
+        }
+
         // Sprache
+        $lang = $this->getCountry()->getLocaleCode();
+
         if ($lang != false) {
             if (!in_array($lang, $this->langs)) {
                 throw new QUI\Exception(
@@ -225,8 +235,6 @@ class Project
                 );
             }
 
-            $this->lang = $lang;
-
         } else {
             // Falls keine Sprache angegeben wurde wird die Standardsprache verwendet
             if (!isset($this->config['default_lang'])) {
@@ -238,9 +246,9 @@ class Project
                     805
                 );
             }
-
-            $this->lang = $this->config['default_lang'];
         }
+
+        $this->lang = $lang;
 
         // Template
         if ($template === false) {
@@ -277,6 +285,13 @@ class Project
                 }
             }
         }
+
+
+        $this->config['langs']        = $this->langs;
+        $this->config['country']      = $this->country;
+        $this->config['lang']         = $this->lang;
+        $this->config['default_lang'] = $this->default_lang;
+
 
         // tabellen setzen
         $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . $this->lang . '_sites';
@@ -362,10 +377,6 @@ class Project
      */
     public function getLanguages()
     {
-        if (is_string($this->langs)) {
-            $this->langs = explode(',', $this->langs);
-        }
-
         return $this->langs;
     }
 
@@ -406,10 +417,7 @@ class Project
             }
         }
 
-        try {
-            $this->Country = QUI\Countries\Manager::get($this->country);
-        } catch (QUI\Exception $Exception) {
-        }
+        $this->Country = QUI\Countries\Manager::get($this->country);
 
         return $this->Country;
     }

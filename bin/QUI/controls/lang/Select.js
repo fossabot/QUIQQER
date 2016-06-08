@@ -69,7 +69,7 @@ define('controls/lang/Select', [
                     this.$Select.appendChild(
                         QUILocale.get('quiqqer/system', 'language.' + languages[i]),
                         languages[i],
-                        URL_BIN_DIR + '16x16/flags/' + languages[i] + '.png'
+                        URL_BIN_DIR + '16x16/flags/' + languages[i].split('_')[0] + '.png'
                     );
                 }
 

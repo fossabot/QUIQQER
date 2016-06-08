@@ -288,6 +288,21 @@ class Locale
     }
 
     /**
+     * Parse a lang string en, de ... to its locale code equivalent de_DE
+     *
+     * @param $lang
+     * @return string
+     */
+    public function parseLangToLocaleCode($lang)
+    {
+        if (strlen($lang) != 2) {
+            return $lang;
+        }
+
+        return mb_strtolower($lang) . '_' . mb_strtoupper($lang);
+    }
+
+    /**
      * Set translation
      *
      * @param string $lang - Language

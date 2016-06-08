@@ -370,6 +370,10 @@ class Manager
             return self::$projects[$project]['_standard'];
         }
 
+        if (strpos($country, '_')) {
+            $country = explode('_', $country)[1];
+        }
+
         if (isset(self::$projects[$project])
             && isset(self::$projects[$project][$country])
         ) {

@@ -69,7 +69,6 @@ define('controls/lang/InputMultiLang', [
             this.$Input.type = 'hidden';
 
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
-
                 var i, len, flag, lang, LangContainer, InputField;
                 var current = QUILocale.getCurrent(),
                     data    = [];
@@ -91,9 +90,19 @@ define('controls/lang/InputMultiLang', [
 
                     data = newData;
                 }
-                
+
                 if (typeOf(data) != 'object') {
                     data = {};
+                }
+
+                for (lang in data) {
+                    if (!data.hasOwnProperty(lang)) {
+                        continue;
+                    }
+                    if (lang.length === 2) {
+                        data[lang.toLowerCase() + '_' + lang.toUpperCase()] = data[lang];
+                        delete data[lang];
+                    }
                 }
 
                 // current language to the top
@@ -115,7 +124,7 @@ define('controls/lang/InputMultiLang', [
 
                 for (i = 0, len = languages.length; i < len; i++) {
                     lang = languages[i];
-                    flag = path + lang + '.png';
+                    flag = path + lang.split('_')[0] + '.png';
 
                     LangContainer = new Element('div', {
                         'class': 'quiqqer-inputmultilang-entry',

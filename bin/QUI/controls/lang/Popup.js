@@ -151,6 +151,7 @@ define('controls/lang/Popup', [
          * Return all available languages
          *
          * @return {Array}
+         * @deprecated wtf :D
          */
         getLanguages : function () {
             return [
