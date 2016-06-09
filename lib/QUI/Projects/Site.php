@@ -195,7 +195,7 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
         }
 
         // DB Tables
-        $this->TABLE        = $Project->getAttribute('db_table');
+        $this->TABLE        = $Project->table();
         $this->RELTABLE     = $this->TABLE . '_relations';
         $this->RELLANGTABLE = $Project->getName() . '_multilingual';
 
@@ -376,7 +376,7 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
         }
 
         $project_name = $this->getProject()->getName();
-        $project_lang = $this->getProject()->getLang();
+        $project_lang = mb_strtolower($this->getProject()->getCountryCode());
         $siteType     = $this->getAttribute('type');
 
         /* @var $Projects \DOMElement */

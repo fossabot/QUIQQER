@@ -447,7 +447,7 @@ define('controls/projects/project/Panel', [
                         continue;
                     }
 
-                    langs = result[i].langs.split(',');
+                    langs = result[i].langs;
 
                     if (typeof self.$projectmaps[i] === 'undefined' || !self.$projectmaps[i]) {
                         self.$projectmaps[i] = new QUISitemap();
@@ -476,8 +476,8 @@ define('controls/projects/project/Panel', [
                         // project Lang
                         Project.appendChild(
                             new QUISitemapItem({
-                                text   : langs[l],
-                                icon   : URL_BIN_DIR + '16x16/flags/' + langs[l] + '.png',
+                                text   : Locale.translateCode(langs[l]),
+                                icon   : URL_BIN_DIR + '16x16/flags/' + langs[l].split('_')[0] + '.png',
                                 name   : 'project.' + i + '.' + langs[l],
                                 project: i,
                                 lang   : langs[l],
@@ -572,7 +572,7 @@ define('controls/projects/project/Panel', [
 
             Container.getElement('h2').setStyles({
                 margin    : '20px 0 0 20px',
-                background: 'url(' + URL_BIN_DIR + '16x16/flags/' + lang + '.png) no-repeat left center',
+                background: 'url(' + URL_BIN_DIR + '16x16/flags/' + lang.split('_')[0] + '.png) no-repeat left center',
                 padding   : '0 0 0 20px'
             });
 

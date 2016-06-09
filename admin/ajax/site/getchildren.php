@@ -80,7 +80,7 @@ QUI::$Ajax->registerFunction(
         }
 
         return array(
-            'count' => $Site->hasChildren(true),
+            'count'    => $Site->hasChildren(true),
             'children' => $childs
         );
     },

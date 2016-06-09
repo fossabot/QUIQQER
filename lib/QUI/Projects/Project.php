@@ -294,15 +294,15 @@ class Project
 
 
         // tabellen setzen
-        $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . $this->lang . '_sites';
+        $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . mb_strtolower($this->country) . '_sites';
         $this->RELTABLE     = QUI_DB_PRFX . $this->TABLE . '_relations';
         $this->RELLANGTABLE = QUI_DB_PRFX . $this->name . '_multilingual';
 
 
         // cache files
         $this->cache_files = array(
-            'types'  => 'projects.' . $this->getAttribute('name') . '.types',
-            'gtypes' => 'projects.' . $this->getAttribute('name') . '.globaltypes'
+            'types'  => 'projects.' . $this->getName() . '.types',
+            'gtypes' => 'projects.' . $this->getName() . '.globaltypes'
         );
     }
 
@@ -348,6 +348,16 @@ class Project
             'country' => $this->getCountry()->getCode(),
             'locale'  => $this->getLocaleCode()
         );
+    }
+
+    /**
+     * Return the database table
+     *
+     * @return string
+     */
+    public function table()
+    {
+        return QUI::getDBProjectTableName('sites', $this);
     }
 
     /**
@@ -589,7 +599,8 @@ class Project
                 return $this->layout;
 
             case "db_table":
-                return $this->name . '_' . $this->getLang() . '_sites';
+                return $this->table();
+            //$this->name . '_' . mb_strtolower($this->getCountryCode()) . '_sites';
 
             default:
                 return false;
@@ -1064,13 +1075,13 @@ class Project
             // @notice - Kann performancefressend sein
             return QUI::getDataBase()->fetch(array(
                 'select' => 'id',
-                'from'   => $this->getAttribute('db_table')
+                'from'   => $this->table()
             ));
         }
 
         $sql = array(
             'select' => 'id',
-            'from'   => $this->getAttribute('db_table')
+            'from'   => $this->table()
         );
 
         if (isset($params['where'])) {

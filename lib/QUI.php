@@ -571,14 +571,14 @@ class QUI
      */
     public static function getDBProjectTableName(
         $table,
-        \QUI\Projects\Project $Project,
+        QUI\Projects\Project $Project,
         $lang = true
     ) {
         if ($lang === false) {
             return QUI_DB_PRFX . $Project->getName() . '_' . $table;
         }
 
-        return QUI_DB_PRFX . $Project->getName() . '_' . $Project->getLang() . '_' . $table;
+        return QUI_DB_PRFX . $Project->getName() . '_' . mb_strtolower($Project->getCountryCode()) . '_' . $table;
     }
 
     /**
@@ -605,13 +605,13 @@ class QUI
 
         if (!isset(self::$Configs[$file])) {
             if (!file_exists($_file) || is_dir($_file)) {
-                throw new \QUI\Exception(
+                throw new QUI\Exception(
                     'Error: Ini Datei: ' . $_file . ' existiert nicht.',
                     404
                 );
             }
 
-            self::$Configs[$file] = new \QUI\Config($_file);
+            self::$Configs[$file] = new QUI\Config($_file);
         }
 
         return self::$Configs[$file];
@@ -625,7 +625,7 @@ class QUI
     public static function getCountries()
     {
         if (self::$Countries === null) {
-            self::$Countries = new \QUI\Countries\Manager();
+            self::$Countries = new QUI\Countries\Manager();
         }
 
         return self::$Countries;
@@ -641,7 +641,7 @@ class QUI
     public static function getDB()
     {
         if (self::$DataBase === null) {
-            self::$DataBase = new \QUI\Utils\MyDB();
+            self::$DataBase = new QUI\Utils\MyDB();
         }
 
         return self::$DataBase;
@@ -655,7 +655,7 @@ class QUI
     public static function getDataBase()
     {
         if (self::$DataBase2 === null) {
-            self::$DataBase2 = new \QUI\Database\DB(array(
+            self::$DataBase2 = new QUI\Database\DB(array(
                 'driver'   => self::conf('db', 'driver'),
                 'host'     => self::conf('db', 'host'),
                 'user'     => self::conf('db', 'user'),
@@ -675,7 +675,7 @@ class QUI
     public static function getEvents()
     {
         if (self::$Events === null) {
-            self::$Events = new \QUI\Events\Manager();
+            self::$Events = new QUI\Events\Manager();
         }
 
         return self::$Events;
@@ -740,7 +740,7 @@ class QUI
         if (self::$ErrorHandler === null) {
             require_once dirname(__FILE__) . '/QUI/Exceptions/Handler.php';
 
-            self::$ErrorHandler = new \QUI\Exceptions\Handler();
+            self::$ErrorHandler = new QUI\Exceptions\Handler();
 
             self::$ErrorHandler->setAttribute(
                 'logdir',
@@ -764,7 +764,7 @@ class QUI
     public static function getGroups()
     {
         if (self::$Groups === null) {
-            self::$Groups = new \QUI\Groups\Manager();
+            self::$Groups = new QUI\Groups\Manager();
         }
 
         return self::$Groups;
@@ -778,7 +778,7 @@ class QUI
     public static function getMessagesHandler()
     {
         if (self::$MessageHandler === null) {
-            self::$MessageHandler = new \QUI\Messages\Handler();
+            self::$MessageHandler = new QUI\Messages\Handler();
         }
 
         return self::$MessageHandler;
@@ -792,7 +792,7 @@ class QUI
     public static function getLocale()
     {
         if (self::$Locale === null) {
-            self::$Locale = new \QUI\Locale();
+            self::$Locale = new QUI\Locale();
 
             if (isset($_REQUEST['lang']) && strlen($_REQUEST['lang']) === 2) {
                 self::$Locale->setCurrent($_REQUEST['lang']);
@@ -816,7 +816,7 @@ class QUI
     public static function getMailManager()
     {
         if (self::$MailManager === null) {
-            self::$MailManager = new \QUI\Mail\Manager();
+            self::$MailManager = new QUI\Mail\Manager();
         }
 
         return self::$MailManager;
@@ -830,7 +830,7 @@ class QUI
     public static function getPackageManager()
     {
         if (self::$PackageManager === null) {
-            self::$PackageManager = new \QUI\Package\Manager();
+            self::$PackageManager = new QUI\Package\Manager();
         }
 
         return self::$PackageManager;
@@ -856,7 +856,7 @@ class QUI
     public static function getProjectManager()
     {
         if (self::$ProjectManager === null) {
-            self::$ProjectManager = new \QUI\Projects\Manager();
+            self::$ProjectManager = new QUI\Projects\Manager();
         }
 
         return self::$ProjectManager;
@@ -878,7 +878,7 @@ class QUI
     public static function getPluginManager()
     {
         if (self::$Plugins === null) {
-            self::$Plugins = new \QUI\Plugins\Manager();
+            self::$Plugins = new QUI\Plugins\Manager();
         }
 
         return self::$Plugins;
@@ -892,7 +892,7 @@ class QUI
     public static function getRewrite()
     {
         if (self::$Rewrite === null) {
-            self::$Rewrite = new \QUI\Rewrite();
+            self::$Rewrite = new QUI\Rewrite();
         }
 
         return self::$Rewrite;
@@ -918,7 +918,7 @@ class QUI
     public static function getPermissionManager()
     {
         if (self::$Rights === null) {
-            self::$Rights = new \QUI\Permissions\Manager();
+            self::$Rights = new QUI\Permissions\Manager();
         }
 
         return self::$Rights;
@@ -960,7 +960,7 @@ class QUI
     public static function getSession()
     {
         if (self::$Session === null) {
-            self::$Session = new \QUI\Session();
+            self::$Session = new QUI\Session();
             self::getRequest()->setSession(self::$Session->getSymfonySession());
         }
 
@@ -975,7 +975,7 @@ class QUI
     public static function getTemp()
     {
         if (self::$Temp === null) {
-            self::$Temp = new \QUI\Temp(VAR_DIR . 'tmp');
+            self::$Temp = new QUI\Temp(VAR_DIR . 'tmp');
         }
 
         return self::$Temp;
@@ -989,7 +989,7 @@ class QUI
     public static function getTemplateManager()
     {
         if (self::$Template === null) {
-            self::$Template = new \QUI\Template();
+            self::$Template = new QUI\Template();
         }
 
         return self::$Template;
@@ -1003,7 +1003,7 @@ class QUI
     public static function getUsers()
     {
         if (self::$Users === null) {
-            self::$Users = new \QUI\Users\Manager();
+            self::$Users = new QUI\Users\Manager();
         }
 
         return self::$Users;

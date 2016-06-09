@@ -16,7 +16,6 @@
  * @require utils/Site
  * @require css!controls/projects/project/Sitemap.css
  */
-
 define('controls/projects/project/Sitemap', [
 
     'qui/controls/Control',

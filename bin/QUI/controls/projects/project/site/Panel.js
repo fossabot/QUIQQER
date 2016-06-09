@@ -246,7 +246,7 @@ define('controls/projects/project/site/Panel', [
             this.setAttributes({
                 title      : title,
                 description: description,
-                icon       : URL_BIN_DIR + '16x16/flags/' + Project.getLang() + '.png'
+                icon       : URL_BIN_DIR + '16x16/flags/' + Project.getLang().split('-')[0] + '.png'
             });
 
             this.parent();
