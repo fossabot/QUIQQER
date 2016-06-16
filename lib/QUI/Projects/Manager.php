@@ -89,6 +89,10 @@ class Manager
             }
 
             if (isset($params[$key])) {
+                if (is_array($params[$key])) {
+                    $params[$key] = json_encode($params[$key]);
+                }
+
                 $str = Orthos::removeHTML($params[$key]);
                 $str = Orthos::clearPath($str);
 
@@ -103,16 +107,17 @@ class Manager
         }
 
         // doppelte sprachen filtern
-        $langs = explode(',', $config['langs']);
-        $langs = array_unique($langs);
+        if (isset($config['langs'])) {
+            $langs = explode(',', $config['langs']);
+            $langs = array_unique($langs);
 
-        $config['langs'] = implode(',', $langs);
+            $config['langs'] = implode(',', $langs);
+        }
 
         $Config->setSection($project, $config);
         $Config->save();
 
-        QUI::getEvents()
-            ->fireEvent('projectConfigSave', array($project, $config));
+        QUI::getEvents()->fireEvent('projectConfigSave', array($project, $config));
 
         // remove the project from the temp
         if (self::$projects[$project]) {
@@ -215,8 +220,8 @@ class Manager
         }
 
         $config = array(
-            "default_lang"             => "de",
-            "langs"                    => "de",
+            "countries"                => json_encode(array('de' => 'de_DE')),
+            "country"                  => "DE",
             "admin_mail"               => "support@pcsg.de",
             "template"                 => "",
             "layout"                   => "",
@@ -411,11 +416,17 @@ class Manager
 
         foreach ($config as $project => $conf) {
             try {
-                $Project = self::getProject(
-                    $project,
-                    $conf['default_lang'],
-                    $conf['template']
-                );
+                if (!isset($conf['default_lang'])) {
+                    $conf['default_lang'] = '';
+                }
+
+                $country = $conf['default_lang'];
+
+                if (isset($conf['country'])) {
+                    $country = $conf['country'];
+                }
+
+                $Project = self::getProject($project, $country, $conf['template']);
 
                 if (isset($conf['standard']) && $conf['standard'] == 1) {
                     self::$Standard = $Project;
@@ -445,7 +456,18 @@ class Manager
         $result = array();
 
         foreach ($config as $project => $conf) {
-            $langs = explode(',', trim($conf['langs']));
+            if (isset($conf['countries'])) {
+                $countries = json_decode($conf['countries'], true);
+                $langs     = array();
+
+                foreach ($countries as $lang => $data) {
+                    $langs[] = $lang;
+                }
+
+            } else {
+                $langs = explode(',', trim($conf['langs']));
+            }
+
 
             foreach ($langs as $lang) {
                 if (isset(self::$projects[$project])
@@ -490,17 +512,25 @@ class Manager
         }
 
         foreach ($config as $project => $conf) {
-            if (isset($conf['standard']) && $conf['standard'] == 1) {
-                self::$Standard = self::getProject(
-                    $project,
-                    $conf['default_lang'],
-                    $conf['template']
-                );
+            if (isset($conf['standard']) && $conf['standard'] != 1) {
+                continue;
             }
+
+            if (!isset($conf['default_lang'])) {
+                $conf['default_lang'] = '';
+            }
+
+            $country = $conf['default_lang'];
+
+            if (isset($conf['country'])) {
+                $country = $conf['country'];
+            }
+
+            self::$Standard = self::getProject($project, $country, $conf['template']);
         }
 
         if (self::$Standard === null) {
-            QUI\System\Log::addAlert(
+            QUI\System\Log::addNotice(
                 'No standard project are set. Please define a standard projekt'
             );
 
@@ -602,7 +632,7 @@ class Manager
         $name = QUI\Utils\Security\Orthos::clear($name);
 
         $DataBase = QUI::getDataBase();
-        $Table    = $DataBase->Table();
+        $Table    = $DataBase->table();
 
 
         /**
@@ -771,7 +801,7 @@ class Manager
         $langs   = $Project->getLanguages();
 
         $DataBase = QUI::getDataBase();
-        $Table    = $DataBase->Table();
+        $Table    = $DataBase->table();
 
         // delete site tables for all languages
         foreach ($langs as $lang) {

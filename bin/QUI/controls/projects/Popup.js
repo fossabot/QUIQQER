@@ -16,7 +16,6 @@
  *
  * @event onSubmit [ {this}, {Object} result ];
  */
-
 define('controls/projects/Popup', [
 
     'qui/controls/windows/Confirm',
@@ -125,7 +124,7 @@ define('controls/projects/Popup', [
 
             // load the projects
             Projects.getList(function (result) {
-                var i, len, langs, project;
+                var i, len, langs, project, countries;
 
                 var selfLangs      = self.getAttribute('langs'),
                     allowedProject = self.getAttribute('project'),
@@ -143,6 +142,11 @@ define('controls/projects/Popup', [
                     }
 
                     langs = result[project].langs;
+
+                    if ("countries" in result[project]) {
+                        countries = JSON.decode(result[project].countries);
+                        langs     = Object.keys(countries);
+                    }
 
                     for (i = 0, len = langs.length; i < len; i++) {
                         if (allowedProject && allowedProject != project) {

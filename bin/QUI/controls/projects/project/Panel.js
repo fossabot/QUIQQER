@@ -407,7 +407,7 @@ define('controls/projects/project/Panel', [
                 }
 
 
-                var i, l, langs, len, Map, Project,
+                var i, l, langs, len, Map, Project, countries,
                     func_project_click, func_media_click, func_trash_click;
 
                 var List = self.$ProjectList;
@@ -447,7 +447,17 @@ define('controls/projects/project/Panel', [
                         continue;
                     }
 
-                    langs = result[i].langs;
+                    if ("countries" in result[i]) {
+                        countries = JSON.decode(result[i].countries);
+                        langs     = Object.values(countries);
+
+                    } else {
+                        langs = result[i].langs;
+
+                        if (typeOf(langs) === 'string') {
+                            langs = langs.split(',');
+                        }
+                    }
 
                     if (typeof self.$projectmaps[i] === 'undefined' || !self.$projectmaps[i]) {
                         self.$projectmaps[i] = new QUISitemap();

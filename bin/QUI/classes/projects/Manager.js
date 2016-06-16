@@ -128,19 +128,30 @@ define('classes/projects/Manager', [
         /**
          * Return the project list
          *
-         * @param {Function} onfinish - callback function
+         * @param {Function} [onfinish] - callback function
          */
         getList: function (onfinish) {
+            return new Promise(function (resolve) {
+                if (this.$getList) {
+                    if (typeof onfinish === 'function') {
+                        onfinish(this.$getList);
+                    }
 
-            if (this.$getList) {
-                onfinish(this.$getList);
-                return;
-            }
+                    resolve(this.$getList);
+                    return;
+                }
 
-            Ajax.get('ajax_project_getlist', function (result) {
-                this.$getList = result;
-                onfinish(result);
+                Ajax.get('ajax_project_getlist', function (result) {
+                    this.$getList = result;
+
+                    if (typeof onfinish === 'function') {
+                        onfinish(this.$getList);
+                    }
+
+                    resolve(this.$getList);
+                }.bind(this));
             }.bind(this));
+
         },
 
         /**

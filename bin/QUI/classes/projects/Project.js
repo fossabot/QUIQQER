@@ -120,12 +120,11 @@ define('classes/projects/Project', [
         /**
          * Return the configuration of the project
          *
-         * @param {Function} callback - callback function
+         * @param {Function} [callback] - callback function
          * @param {String} [param] - param name
          * @return Promise
          */
         getConfig: function (callback, param) {
-
             return new Promise(function (resolve, reject) {
 
                 param = param || false;
@@ -189,14 +188,12 @@ define('classes/projects/Project', [
         getDefaults: function () {
             var self = this;
             return new Promise(function (resolve, reject) {
-
                 Ajax.get('ajax_project_get_defaults', function (result) {
                     resolve(result);
                 }, {
                     project: self.encode(),
                     onError: reject
                 });
-
             });
         },
 
@@ -211,7 +208,6 @@ define('classes/projects/Project', [
         setConfig: function (params, callback) {
             var self = this;
             return new Promise(function (resolve, reject) {
-
                 Ajax.post('ajax_project_set_config', function (result) {
                     self.$config = false;
 
@@ -227,7 +223,6 @@ define('classes/projects/Project', [
                     params : JSON.encode(params || false),
                     onError: reject
                 });
-
             });
         },
 
@@ -288,6 +283,38 @@ define('classes/projects/Project', [
          */
         getCountry: function () {
             return this.getAttribute('country');
+        },
+
+        /**
+         *
+         */
+        getCountries: function () {
+
+        },
+
+        /**
+         * Return all available languages from the project
+         *
+         * @returns {Promise}
+         */
+        getLanguages: function () {
+            return new Promise(function (resolve, reject) {
+
+                if (this.$config) {
+                    resolve(
+                        Object.keys(
+                            JSON.decode(this.$config.countries)
+                        )
+                    );
+
+                    return;
+                }
+
+                this.getConfig().then(function () {
+                    resolve(this.getLanguages());
+                }.bind(this), reject);
+
+            }.bind(this));
         },
 
         /**

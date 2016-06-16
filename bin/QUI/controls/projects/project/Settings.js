@@ -266,6 +266,8 @@ define('controls/projects/project/Settings', [
                 self.Loader.hide();
             };
 
+            console.log(this.$config);
+
             Project.setConfig(this.$config).then(callback).catch(callback);
         },
 
@@ -389,7 +391,7 @@ define('controls/projects/project/Settings', [
                         }).inject(Langs, 'after');
 
                         Langs.addEvent('dblclick', function () {
-                            self.openLanguageDialog(this.value.split(':')[0]);
+                            self.openLanguageDialog(this.value);
                         });
 
                         QUIFormUtils.setDataToForm(self.$config, Form);
@@ -529,12 +531,13 @@ define('controls/projects/project/Settings', [
          * @param {String} [countryCode] - edit the country code
          */
         openLanguageDialog: function (countryCode) {
-            var title = 'Sprache hinzufügen';
+            var self  = this,
+                title = 'Sprache hinzufügen';
 
             if (typeof countryCode !== 'undefined') {
                 title = 'Sprache editieren';
             }
-            console.log(countryCode);
+
             new QUIConfirm({
                 icon     : URL_BIN_DIR + '16x16/flags/default.png',
                 title    : title,
@@ -566,13 +569,30 @@ define('controls/projects/project/Settings', [
                                 Languages = Content.getElement('[name="languages"]');
 
                             if (typeof countryCode !== 'undefined') {
+                                var code = countryCode.split(':')[0].toUpperCase();
+
                                 new Element('option', {
-                                    value: countryCode,
-                                    html : Locale.get('quiqqer/countries', 'country.' + countryCode.toUpperCase())
+                                    value: code,
+                                    html : Locale.get('quiqqer/countries', 'country.' + code)
                                 }).inject(Country);
 
                                 Country.disabled = true;
                             } else {
+                                countries.sort(function (a, b) {
+                                    var nameA = Locale.get('quiqqer/countries', 'country.' + a);
+                                    var nameB = Locale.get('quiqqer/countries', 'country.' + b);
+
+                                    if (nameA > nameB) {
+                                        return 1;
+                                    }
+
+                                    if (nameA < nameB) {
+                                        return -1;
+                                    }
+
+                                    return 0;
+                                });
+
                                 for (i = 0, len = countries.length; i < len; i++) {
                                     new Element('option', {
                                         value: countries[i],
@@ -589,15 +609,48 @@ define('controls/projects/project/Settings', [
                                 }).inject(Languages);
                             }
 
+                            if (typeof countryCode !== 'undefined') {
+                                Languages.value = countryCode.split(':')[1];
+                            }
+
                             Win.Loader.hide();
                         });
                     },
                     onSubmit: function (Win) {
                         var Content   = Win.getContent(),
                             Country   = Content.getElement('[name="country"]'),
-                            Languages = Content.getElement('[name="languages"]');
+                            Languages = Content.getElement('[name="languages"]'),
+                            Form      = self.getElm().getElement('form'),
+                            Countries = Form.elements.countries;
 
+                        if (!Countries) {
+                            return;
+                        }
 
+                        var country  = Country.value;
+                        var language = Languages.value;
+                        var value    = country + ':' + language;
+                        var html     = Locale.get('quiqqer/countries', 'country.' + country.toUpperCase()) + ': ' +
+                                       Locale.translateCode(language);
+
+                        // add language
+                        if (typeof countryCode === 'undefined') {
+                            new Element('option', {
+                                value: value,
+                                html : html
+                            }).inject(Countries);
+
+                            return;
+                        }
+
+                        var Option = Countries.getElement('[value="' + countryCode + '"]');
+
+                        Option.set({
+                            value: value,
+                            html : html
+                        });
+
+                        Win.close();
                     }
                 }
             }).open();
@@ -646,8 +699,23 @@ define('controls/projects/project/Settings', [
                 this.$config.langs = langs.join(',');
             }
 
+            if (typeof Form.elements.countries !== 'undefined') {
+                var Countries = Form.elements.countries,
+                    countries = {};
+
+                Countries.getElements('option').each(function (Option) {
+                    countries[Option.value.split(':')[0]] = Option.value.split(':')[1];
+                });
+
+                this.$config.countries = JSON.encode(countries);
+            }
+
             if (noHide === true) {
                 return Promise.resolve();
+            }
+
+            if (typeOf(this.$config.langs) === 'array') {
+                this.$config.langs = this.$config.langs.join(',');
             }
 
             return this.$hideBody();

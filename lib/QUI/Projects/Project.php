@@ -102,6 +102,13 @@ class Project
     private $langs;
 
     /**
+     * All countries data
+     *
+     * @var array
+     */
+    private $countries = array();
+
+    /**
      * template of the project
      *
      * @var array
@@ -169,32 +176,10 @@ class Project
             );
         }
 
-        $this->config  = $config[$name];
-        $this->name    = $name;
-        $this->country = $country;
-
-        // Langs
-        if (!isset($this->config['langs'])) {
-            throw new QUI\Exception(
-                QUI::getLocale()->get(
-                    'quiqqer/system',
-                    'exception.project.has.no.langs'
-                ),
-                803
-            );
-        }
-
-        $this->langs = explode(',', $this->config['langs']);
-
-        // parse langs to locales
-        foreach ($this->langs as $key => $l) {
-            if (strpos($l, '_') === false) {
-                $this->langs[$key] = QUI::getLocale()->parseLangToLocaleCode($l);
-            }
-        }
+        $this->config = $config[$name];
 
         // Default Lang
-        if (!isset($this->config['default_lang'])) {
+        if (!isset($this->config['default_lang']) && !isset($this->config['country'])) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/system',
@@ -204,59 +189,68 @@ class Project
             );
         }
 
-        $this->default_lang = QUI::getLocale()->parseLangToLocaleCode($this->config['default_lang']);
+        $this->name    = $name;
+        $this->country = mb_strtolower($country);
+        $this->langs   = array();
 
-        if ($this->country) {
-            $this->country = mb_strtolower($this->country);
+        if (!$this->country && isset($this->config['country'])) {
+            $this->country = mb_strtolower($this->config['country']);
         }
 
-        if (!$this->country) {
-            $this->country = mb_strtolower(explode('_', $this->default_lang)[1]);
-        }
+        // country countries locale
+        if (isset($this->config['countries'])) {
+            $this->countries = json_decode($this->config['countries'], true);
 
-        if (isset($this->config['layout'])) {
-            $this->layout = $this->config['layout'];
-        }
+            foreach ($this->countries as $country => $locale) {
+                $this->langs[] = $locale;
+            }
 
-        if (isset($this->config['locale'])) {
-            $this->locale = $this->config['locale'];
-        }
+            $country = $this->country;
+            $default = mb_strtolower($this->config['country']);
 
-        if ($this->country === false) {
-            $this->country = mb_strtolower(explode('_', $this->default_lang)[1]);
-        }
-
-        // Sprache
-        $lang = $this->getCountry()->getLocaleCode();
-
-        if ($lang != false) {
-            if (!in_array($lang, $this->langs)) {
+            if (!isset($this->countries[$country])) {
                 throw new QUI\Exception(
-                    QUI::getLocale()->get(
+                    array(
                         'quiqqer/system',
                         'exception.project.lang.not.found',
-                        array(
-                            'lang' => $lang
-                        )
+                        array('lang' => $country)
                     ),
                     806
                 );
             }
 
+            $this->default_lang = $this->countries[$default];
+            $this->lang         = $this->countries[$country];
+
         } else {
-            // Falls keine Sprache angegeben wurde wird die Standardsprache verwendet
-            if (!isset($this->config['default_lang'])) {
-                throw new QUI\Exception(
-                    QUI::getLocale()->get(
-                        'quiqqer/system',
-                        'exception.project.lang.no.default'
-                    ),
-                    805
+            // old languages
+            $langs = explode(',', $this->config['langs']);
+
+            // parse langs to locales
+            foreach ($langs as $key => $l) {
+                if (strpos($l, '_') === false) {
+                    $this->langs[] = QUI::getLocale()->parseLangToLocaleCode($l);
+                }
+            }
+
+            if (isset($this->config['default_lang'])) {
+                $this->default_lang = QUI::getLocale()->parseLangToLocaleCode(
+                    $this->config['default_lang']
                 );
             }
+
+            if ($this->country === false) {
+                $this->country = mb_strtolower(explode('_', $this->default_lang)[1]);
+            }
+
+            $this->lang         = $this->getCountry()->getLocaleCode();
+            $this->default_lang = $this->getCountry()->getLocaleCode();
         }
 
-        $this->lang = $lang;
+
+        if (isset($this->config['layout'])) {
+            $this->layout = $this->config['layout'];
+        }
 
         // Template
         if ($template === false) {
@@ -294,13 +288,6 @@ class Project
             }
         }
 
-
-        $this->config['langs']        = $this->langs;
-        $this->config['country']      = $this->country;
-        $this->config['lang']         = $this->lang;
-        $this->config['default_lang'] = $this->default_lang;
-
-
         // tabellen setzen
         $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . $this->country . '_sites';
         $this->RELTABLE     = QUI_DB_PRFX . $this->TABLE . '_relations';
@@ -310,7 +297,8 @@ class Project
         // cache files
         $this->cache_files = array(
             'types'  => 'projects.' . $this->getName() . '.types',
-            'gtypes' => 'projects.' . $this->getName() . '.globaltypes'
+            'gtypes' => 'projects.' . $this->getName() . '.globaltypes',
+            'edate'  => 'projects/edate/' . md5($this->getName() . '_' . $this->getLang()),
         );
     }
 
@@ -1206,24 +1194,24 @@ class Project
         $Config = QUI::getConfig('etc/projects.ini.php');
         $config = $Config->toArray();
 
-        if (isset($config[$this->name])) {
+        // patch for old projects
+        if (isset($config[$this->name])
+            && isset($config[$this->name]['default_lang'])
+            && isset($config[$this->name]['langs'])
+            && !isset($config[$this->name]['country'])
+            && !isset($config[$this->name]['countries'])
+        ) {
             $default_lang = $config[$this->name]['default_lang'];
-            $langs        = $config[$this->name]['langs'];
+            $langs        = explode(',', $config[$this->name]['langs']);
+            $countries    = array();
 
-            if (!isset($config[$this->name]['country'])
-                && !isset($config[$this->name]['countries'])
-            ) {
-                $langs     = explode(',', $langs);
-                $countries = array();
-
-                foreach ($langs as $lang) {
-                    $countries[$lang] = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
-                }
-
-                $Config->setValue($this->name, 'country', mb_strtoupper($default_lang));
-                $Config->setValue($this->name, 'countries', json_encode($countries));
-                $Config->save();
+            foreach ($langs as $lang) {
+                $countries[$lang] = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
             }
+
+            $Config->setValue($this->name, 'country', mb_strtoupper($default_lang));
+            $Config->setValue($this->name, 'countries', json_encode($countries));
+            $Config->save();
         }
 
         // multi lingual table
@@ -1233,9 +1221,9 @@ class Project
             'id' => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY'
         ));
 
-
-        foreach ($this->langs as $lang) {
-            $table = QUI_DB_PRFX . $this->name . '_' . $lang . '_sites';
+        foreach ($this->countries as $country => $data) {
+            $country = mb_strtolower($country);
+            $table   = QUI_DB_PRFX . $this->name . '_' . $country . '_sites';
 
             $Table->addColumn($table, array(
                 'id'            => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
@@ -1313,7 +1301,7 @@ class Project
             }
 
             // Beziehungen
-            $table = QUI_DB_PRFX . $this->name . '_' . $lang . '_sites_relations';
+            $table = QUI_DB_PRFX . $this->name . '_' . $country . '_sites_relations';
 
             $Table->addColumn($table, array(
                 'parent'  => 'bigint(20)',
@@ -1327,11 +1315,11 @@ class Project
             // multilingual field
             $Table->addColumn(
                 $multiLingualTable,
-                array($lang => 'bigint(20)')
+                array($country => 'bigint(20)')
             );
 
             // Translation Setup
-            QUI\Translator::addLang($lang);
+            QUI\Translator::addLang($country);
         }
 
         // Media Setup
@@ -1382,10 +1370,7 @@ class Project
      */
     public function setEditDate($date)
     {
-        QUI\Cache\Manager::set(
-            'projects/edate/' . md5($this->getName() . '_' . $this->getLang()),
-            (int)$date
-        );
+        QUI\Cache\Manager::set($this->cache_files['edate'], (int)$date);
     }
 
     /**
@@ -1432,10 +1417,7 @@ class Project
     public function getLastEditDate()
     {
         try {
-            return (int)QUI\Cache\Manager::get(
-                'projects/edate/' . md5($this->getName() . '_' . $this->getLang())
-            );
-
+            return (int)QUI\Cache\Manager::get($this->cache_files['edate']);
         } catch (QUI\Exception $Exception) {
         }
 
