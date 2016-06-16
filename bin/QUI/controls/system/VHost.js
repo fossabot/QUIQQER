@@ -1,4 +1,3 @@
-
 /**
  * VHost control
  * edit and change a vhost entry
@@ -40,33 +39,32 @@ define('controls/system/VHost', [
 
     var lg = 'quiqqer/system';
 
-    var QUI          = arguments[ 0 ],
-        QUIControl   = arguments[ 1 ],
-        QUILoader    = arguments[ 2 ],
-        FormUtils    = arguments[ 3 ],
-        Grid         = arguments[ 4 ],
-        ControlUtils = arguments[ 5 ],
-        StringUtils  = arguments[ 6 ],
-        Ajax         = arguments[ 7 ],
-        Locale       = arguments[ 8 ],
-        Projects     = arguments[ 9 ];
+    var QUIControl   = arguments[1],
+        QUILoader    = arguments[2],
+        FormUtils    = arguments[3],
+
+        ControlUtils = arguments[5],
+        StringUtils  = arguments[6],
+        Ajax         = arguments[7],
+        Locale       = arguments[8],
+        Projects     = arguments[9];
 
 
     return new Class({
 
-        Extends : QUIControl,
-        Type    : 'controls/system/VHosts',
+        Extends: QUIControl,
+        Type   : 'controls/system/VHosts',
 
-        Binds : [
+        Binds: [
             '$onInject'
         ],
 
-        options : {
-            host : false,
-            data : {}
+        options: {
+            host: false,
+            data: {}
         },
 
-        initialize : function (options) {
+        initialize: function (options) {
             this.parent(options);
 
             this.$Elm            = null;
@@ -78,7 +76,7 @@ define('controls/system/VHost', [
             this.Loader = new QUILoader();
 
             this.addEvents({
-                onInject : this.$onInject
+                onInject: this.$onInject
             });
         },
 
@@ -87,9 +85,9 @@ define('controls/system/VHost', [
          *
          * @return {HTMLElement}
          */
-        create : function () {
+        create: function () {
             this.$Elm = new Element('div', {
-                'class' : 'control-system-vhost box'
+                'class': 'control-system-vhost box'
             });
 
             this.Loader.inject(this.$Elm);
@@ -100,7 +98,7 @@ define('controls/system/VHost', [
         /**
          * event : on inject
          */
-        $onInject : function () {
+        $onInject: function () {
             var self = this;
 
             this.Loader.show();
@@ -112,7 +110,8 @@ define('controls/system/VHost', [
                 var i, len;
 
                 var project = vhostData.project,
-                    lang    = vhostData.lang,
+                    lang    = vhostData.country || vhostData.lang,
+                    country = vhostData.country || vhostData.lang,
                     error   = vhostData.error || '';
 
                 vhostData.domain = self.getAttribute('host');
@@ -120,6 +119,7 @@ define('controls/system/VHost', [
                 delete vhostData.project;
                 delete vhostData.lang;
                 delete vhostData.error;
+                delete vhostData.country;
 
                 self.setAttribute('data', vhostData);
 
@@ -129,76 +129,76 @@ define('controls/system/VHost', [
                     '<form action="">' +
                     '<table class="data-table">' +
                     '<thead>' +
-                        '<tr>' +
-                            '<th colspan="2">' +
-                                Locale.get(lg, 'system.vhost.table.hostdata') +
-                            '</th>' +
-                        '</th>' +
+                    '<tr>' +
+                    '<th colspan="2">' +
+                    Locale.get(lg, 'system.vhost.table.hostdata') +
+                    '</th>' +
+                    '</th>' +
                     '</thead>' +
                     '<tbody>' +
-                        '<tr class="odd">' +
-                            '<td style="width: 150px;">' +
-                                '<label for="">' +
-                                    Locale.get(lg, 'system.vhost.label.domain') +
-                                '</label>' +
-                            '</td>' +
-                            '<td>' +
-                                '<input type="text" name="domain" disabled="disabled" />' +
-                            '</td>' +
-                        '</tr>' +
-                        '<tr class="even">' +
-                            '<td>' +
-                                '<label for="">' +
-                                    Locale.get(lg, 'project') +
-                                '</label>' +
-                            '</td>' +
-                            '<td>' +
-                                '<input type="text" class="project" name="project" />' +
-                            '</td>' +
-                        '</tr>' +
-                        '<tr class="odd">' +
-                            '<td>' +
-                                '<label for="">' +
-                                    Locale.get(lg, 'template') +
-                                '</label>' +
-                            '</td>' +
-                            '<td>' +
-                                '<select name="template"></select>' +
-                            '</td>' +
-                        '</tr>' +
-                        '<tr class="even">' +
-                            '<td>' +
-                                '<label for="">' +
-                                    Locale.get(lg, 'system.vhost.label.errorsite') +
-                                '</label>' +
-                            '</td>' +
-                            '<td>' +
-                                '<input name="error" class="project-site" />' +
-                            '</td>' +
-                        '</tr>' +
-                        '<tr class="odd">' +
-                            '<td>' +
-                                '<label for="">' +
-                                    Locale.get(lg, 'system.vhost.label.httpshost') +
-                                '</label>' +
-                            '</td>' +
-                            '<td>' +
-                                '<input name="httpshost" />' +
-                            '</td>' +
-                        '</tr>' +
+                    '<tr class="odd">' +
+                    '<td style="width: 150px;">' +
+                    '<label for="">' +
+                    Locale.get(lg, 'system.vhost.label.domain') +
+                    '</label>' +
+                    '</td>' +
+                    '<td>' +
+                    '<input type="text" name="domain" disabled="disabled" />' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr class="even">' +
+                    '<td>' +
+                    '<label for="">' +
+                    Locale.get(lg, 'project') +
+                    '</label>' +
+                    '</td>' +
+                    '<td>' +
+                    '<input type="text" class="project" name="project" />' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr class="odd">' +
+                    '<td>' +
+                    '<label for="">' +
+                    Locale.get(lg, 'template') +
+                    '</label>' +
+                    '</td>' +
+                    '<td>' +
+                    '<select name="template"></select>' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr class="even">' +
+                    '<td>' +
+                    '<label for="">' +
+                    Locale.get(lg, 'system.vhost.label.errorsite') +
+                    '</label>' +
+                    '</td>' +
+                    '<td>' +
+                    '<input name="error" class="project-site" />' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr class="odd">' +
+                    '<td>' +
+                    '<label for="">' +
+                    Locale.get(lg, 'system.vhost.label.httpshost') +
+                    '</label>' +
+                    '</td>' +
+                    '<td>' +
+                    '<input name="httpshost" />' +
+                    '</td>' +
+                    '</tr>' +
                     '</tbody>' +
                     '</table>' +
 
                     '<table class="data-table control-system-vhost-languages">' +
                     '<thead>' +
-                        '<tr>' +
-                            '<th colspan="2">' +
-                                Locale.get(lg, 'system.vhost.table.languages') +
-                                '<div class="description">' +
-                                    Locale.get(lg, 'system.vhost.table.language.description') +
-                                '</div>' +
-                            '</th>' +
-                        '</th>' +
+                    '<tr>' +
+                    '<th colspan="2">' +
+                    Locale.get(lg, 'system.vhost.table.languages') +
+                    '<div class="description">' +
+                    Locale.get(lg, 'system.vhost.table.language.description') +
+                    '</div>' +
+                    '</th>' +
+                    '</th>' +
                     '</thead>' +
                     '<tbody></tbody>' +
                     '</table>' +
@@ -212,8 +212,9 @@ define('controls/system/VHost', [
 
                 // project data
                 self.$ProjectInput.value = JSON.encode([{
-                    project : project,
-                    lang    : lang
+                    project: project,
+                    lang   : lang,
+                    country: country
                 }]);
 
                 // error site
@@ -221,10 +222,10 @@ define('controls/system/VHost', [
                     error = error.split(',');
 
                     self.$ErrorSite.value = 'index.php?' + Object.toQueryString({
-                        project : error[ 0 ],
-                        lang    : error[ 1 ],
-                        id      : error[ 2 ]
-                    });
+                            project: error[0],
+                            lang   : error[1],
+                            id     : error[2]
+                        });
                 }
 
                 // create controls
@@ -237,14 +238,14 @@ define('controls/system/VHost', [
 
                 // create template select
                 new Element('option', {
-                    value : '',
-                    html  : ''
+                    value: '',
+                    html : ''
                 }).inject(self.$TemplateSelect);
 
                 for (i = 0, len = templates.length; i < len; i++) {
                     new Element('option', {
-                        value : templates[ i ].name,
-                        html  : templates[ i ].name
+                        value: templates[i].name,
+                        html : templates[i].name
                     }).inject(self.$TemplateSelect);
                 }
 
@@ -262,7 +263,7 @@ define('controls/system/VHost', [
                 });
 
             }, {
-                vhost : this.getAttribute('host')
+                vhost: this.getAttribute('host')
             });
         },
 
@@ -271,15 +272,15 @@ define('controls/system/VHost', [
          *
          * @param {Function} [callback] - (optional), callback function after saving
          */
-        save : function (callback) {
+        save: function (callback) {
             var i, len, data, langFields, siteParts;
 
-            var self      = this,
-                errorSite = '',
+            var self        = this,
+                errorSite   = '',
 
                 projectData = {
-                    project : '',
-                    lang    : ''
+                    project: '',
+                    lang   : ''
                 };
 
             this.Loader.show();
@@ -289,8 +290,8 @@ define('controls/system/VHost', [
             if (self.$ProjectInput.value !== '') {
                 projectData = JSON.decode(self.$ProjectInput.value);
 
-                if (projectData[ 0 ]) {
-                    projectData = projectData[ 0 ];
+                if (projectData[0]) {
+                    projectData = projectData[0];
                 }
             }
 
@@ -303,11 +304,12 @@ define('controls/system/VHost', [
 
             // complete data
             data = {
-                project   : projectData.project,
-                lang      : projectData.lang,
-                template  : this.$TemplateSelect.value,
-                error     : errorSite,
-                httpshost : this.$HttpsHost.value
+                project  : projectData.project,
+                lang     : projectData.lang,
+                country  : projectData.country,
+                template : this.$TemplateSelect.value,
+                error    : errorSite,
+                httpshost: this.$HttpsHost.value
             };
 
             // lang hosts
@@ -316,8 +318,8 @@ define('controls/system/VHost', [
             );
 
             for (i = 0, len = langFields.length; i < len; i++) {
-                if (langFields[ i ].value !== '') {
-                    data[ langFields[ i ].name ] = langFields[ i ].value;
+                if (langFields[i].value !== '') {
+                    data[langFields[i].name] = langFields[i].value;
                 }
             }
 
@@ -326,8 +328,8 @@ define('controls/system/VHost', [
                     callback();
                 }
             }, {
-                vhost : this.getAttribute('host'),
-                data  : JSON.encode(data)
+                vhost: this.getAttribute('host'),
+                data : JSON.encode(data)
             });
         },
 
@@ -336,12 +338,12 @@ define('controls/system/VHost', [
          *
          * @param {Function} [callback] - (optional), callback on end
          */
-        $loadProjectLangs : function (callback) {
+        $loadProjectLangs: function (callback) {
             var self = this,
                 data = JSON.decode(this.$ProjectInput.value);
 
             // no project
-            if (typeof data[ 0 ] === 'undefined' || !data[ 0 ].project) {
+            if (typeof data[0] === 'undefined' || !data[0].project) {
                 var TBody = self.$Elm.getElement(
                     '.control-system-vhost-languages tbody'
                 );
@@ -351,7 +353,7 @@ define('controls/system/VHost', [
                         'html',
 
                         '<tr class="odd"><td>' +
-                            Locale.get(lg, 'system.vhost.table.language.noproject.info') +
+                        Locale.get(lg, 'system.vhost.table.language.noproject.info') +
                         '<td></tr>'
                     );
                 }
@@ -365,9 +367,8 @@ define('controls/system/VHost', [
 
 
             // get the project langs
-            Projects.get(data[ 0 ].project).getConfig(function (config) {
-                var langs = config.langs.split(','),
-
+            Projects.get(data[0].project).getConfig(function (config) {
+                var langs = config.langs,
                     TBody = self.$Elm.getElement(
                         '.control-system-vhost-languages tbody'
                     );
@@ -385,25 +386,25 @@ define('controls/system/VHost', [
                     vhostData = self.getAttribute('data');
 
                 for (i = 0, len = langs.length; i < len; i++) {
-                    if (data[ 0 ].lang === langs[ i ]) {
+                    if (data[0].lang === langs[i]) {
                         continue;
                     }
 
                     cssClass = cssClass === 'odd' ? 'even' : 'odd';
-                    lang     = langs[ i ];
+                    lang     = langs[i];
                     host     = '';
 
                     Row = new Element('tr', {
-                        'class' : cssClass,
-                        html    : '<td style="width: 150px;">' + lang + '</td>' +
-                                  '<td>' +
-                                      '<input type="text" value="' + host + '" name="' + lang + '" placeholder="http://www.host.tld" />' +
-                                  '</td>'
+                        'class': cssClass,
+                        html   : '<td style="width: 150px;">' + lang + '</td>' +
+                                 '<td>' +
+                                 '<input type="text" value="' + host + '" name="' + lang + '" placeholder="http://www.host.tld" />' +
+                                 '</td>'
                     }).inject(TBody);
 
                     // set host
-                    if (vhostData[ lang ]) {
-                        Row.getElement('input').value = vhostData[ lang ];
+                    if (vhostData[lang]) {
+                        Row.getElement('input').value = vhostData[lang];
                         continue;
                     }
 
@@ -411,9 +412,9 @@ define('controls/system/VHost', [
                     Ajax.get('ajax_vhosts_getHostByProject', function (result) {
                         Row.getElement('input').value = result;
                     }.bind(Row), {
-                        project : JSON.encode({
-                            name : data[ 0 ].project,
-                            lang : lang
+                        project: JSON.encode({
+                            name: data[0].project,
+                            lang: lang
                         })
                     });
                 }

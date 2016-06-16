@@ -115,8 +115,10 @@
 
     {foreach from=$langIds item=entry key=lang}
     {if $lang != $Project->getLang()}
-    <tr class="{cycle values="even,odd"}" data-lang="{$lang}" data-id="{$entry}">
+    <tr class="{cycle values="even,odd"}" data-lang="{$lang}" data-lang="{$lang}" data-id="{$entry}">
         <td style="width: 30px;">
+            {assign var=lang value=explode("_",$lang)}
+            {assign var=lang value=$lang.0}
             <img src="{$smarty.const.URL_BIN_DIR}16x16/flags/{$lang}.png" />
         </td>
         <td>

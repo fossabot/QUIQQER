@@ -15,13 +15,13 @@ define('utils/Panels', function () {
          * if the panel exists, there will be used
          *
          * @param {String} project - name of the Project
-         * @param {String} lang - languag of the Project
+         * @param {String} country - country of the Project
          * @param {Number} id - ID of the Site
          * @param {Function} [callback] - callback function, only triggered if the panel is not exist
          *
          * @return Promise
          */
-        openSitePanel: function (project, lang, id, callback) {
+        openSitePanel: function (project, country, id, callback) {
             var self = this;
 
             return new Promise(function (resolve, reject) {
@@ -32,7 +32,7 @@ define('utils/Panels', function () {
                     'controls/projects/project/site/Panel',
                     'Projects'
                 ], function (QUI, QUIPanel, SitePanel, Projects) {
-                    var n      = 'panel-' + project + '-' + lang + '-' + id,
+                    var n      = 'panel-' + project + '-' + country + '-' + id,
                         panels = QUI.Controls.get(n);
 
                     if (panels.length) {
@@ -56,7 +56,7 @@ define('utils/Panels', function () {
                     }
 
                     var Panel = new SitePanel(
-                        Projects.get(project, lang).get(id)
+                        Projects.get(project, country).get(id)
                     );
 
                     panels[0].appendChild(Panel);

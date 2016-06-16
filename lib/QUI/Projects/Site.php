@@ -668,11 +668,12 @@ class Site extends QUI\QDOM implements QUI\Interfaces\Projects\Site
 
         try {
             $Project = $this->getProject();
+            $country = $Project->getCountry()->getCodeToLower();
 
             $dbResult = QUI::getDataBase()->fetch(array(
                 'from'  => $Project->getName() . '_multilingual',
                 'where' => array(
-                    $Project->getLang() => $this->getId()
+                    $country => $this->getId()
                 )
             ));
 

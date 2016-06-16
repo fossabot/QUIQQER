@@ -16,7 +16,6 @@
  * @event createChild [ this ]
  * @event sortSave [ this ] --> triggerd by SiteChildren.js
  */
-
 define('classes/projects/project/Site', [
 
     'qui/QUI',

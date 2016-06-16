@@ -206,6 +206,14 @@ class Project
 
         $this->default_lang = QUI::getLocale()->parseLangToLocaleCode($this->config['default_lang']);
 
+        if ($this->country) {
+            $this->country = mb_strtolower($this->country);
+        }
+
+        if (!$this->country) {
+            $this->country = mb_strtolower(explode('_', $this->default_lang)[1]);
+        }
+
         if (isset($this->config['layout'])) {
             $this->layout = $this->config['layout'];
         }
@@ -215,7 +223,7 @@ class Project
         }
 
         if ($this->country === false) {
-            $this->country = explode('_', $this->default_lang)[1];
+            $this->country = mb_strtolower(explode('_', $this->default_lang)[1]);
         }
 
         // Sprache
@@ -294,7 +302,7 @@ class Project
 
 
         // tabellen setzen
-        $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . mb_strtolower($this->country) . '_sites';
+        $this->TABLE        = QUI_DB_PRFX . $this->name . '_' . $this->country . '_sites';
         $this->RELTABLE     = QUI_DB_PRFX . $this->TABLE . '_relations';
         $this->RELLANGTABLE = QUI_DB_PRFX . $this->name . '_multilingual';
 
@@ -407,7 +415,7 @@ class Project
     /**
      * Return the project country
      *
-     * @return null|QUI\Countries\Country
+     * @return QUI\Countries\Country
      */
     public function getCountry()
     {
@@ -480,9 +488,7 @@ class Project
      */
     public function search($search, $select = false)
     {
-        $table = $this->getAttribute('db_table');
-
-        $query = 'SELECT id FROM ' . $table;
+        $query = 'SELECT id FROM ' . $this->table();
         $where = ' WHERE name LIKE :search';
 
         $allowed = array('id', 'name', 'title', 'short', 'content');
@@ -544,14 +550,9 @@ class Project
                 continue;
             }
 
-            if ($params['project'] == $this->getAttribute('name')
-                && $params['lang'] == $this->getAttribute('lang')
-            ) {
-                if ($ssl && isset($params['httpshost'])
-                    && !empty($params['httpshost'])
-                ) {
-                    return $with_protocol ? 'https://' . $params['httpshost']
-                        : $params['httpshost'];
+            if ($params['project'] == $this->getName() && $params['lang'] == $this->getLang()) {
+                if ($ssl && isset($params['httpshost']) && !empty($params['httpshost'])) {
+                    return $with_protocol ? 'https://' . $params['httpshost'] : $params['httpshost'];
                 }
 
                 return $with_protocol ? 'http://' . $url : $url;
@@ -716,7 +717,7 @@ class Project
     public function clearCache($link = true, $site = true)
     {
         if ($link == true) {
-            $cache = VAR_DIR . 'cache/links/' . $this->getAttribute('name') . '/';
+            $cache = VAR_DIR . 'cache/links/' . $this->getName() . '/';
             $files = QUI\Utils\System\File::readDir($cache);
 
             foreach ($files as $file) {
@@ -725,7 +726,7 @@ class Project
         }
 
         if ($site == true) {
-            $cache = VAR_DIR . 'cache/sites/' . $this->getAttribute('name') . '/';
+            $cache = VAR_DIR . 'cache/sites/' . $this->getName() . '/';
             $files = QUI\Utils\System\File::readDir($cache);
 
             foreach ($files as $file) {
@@ -796,7 +797,7 @@ class Project
     {
         $maxid = QUI::getDataBase()->fetch(array(
             'select' => 'id',
-            'from'   => $this->getAttribute('db_table'),
+            'from'   => $this->table(),
             'limit'  => '0,1',
             'order'  => array(
                 'id' => 'DESC'
@@ -1200,6 +1201,30 @@ class Project
         $DataBase = QUI::getDataBase();
         $Table    = $DataBase->table();
         $User     = QUI::getUserBySession();
+
+        // patch -> locale
+        $Config = QUI::getConfig('etc/projects.ini.php');
+        $config = $Config->toArray();
+
+        if (isset($config[$this->name])) {
+            $default_lang = $config[$this->name]['default_lang'];
+            $langs        = $config[$this->name]['langs'];
+
+            if (!isset($config[$this->name]['country'])
+                && !isset($config[$this->name]['countries'])
+            ) {
+                $langs     = explode(',', $langs);
+                $countries = array();
+
+                foreach ($langs as $lang) {
+                    $countries[$lang] = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
+                }
+
+                $Config->setValue($this->name, 'country', mb_strtoupper($default_lang));
+                $Config->setValue($this->name, 'countries', json_encode($countries));
+                $Config->save();
+            }
+        }
 
         // multi lingual table
         $multiLingualTable = QUI_DB_PRFX . $this->name . '_multilingual';

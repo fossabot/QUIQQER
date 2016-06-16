@@ -246,7 +246,7 @@ define('controls/projects/project/site/Panel', [
             this.setAttributes({
                 title      : title,
                 description: description,
-                icon       : URL_BIN_DIR + '16x16/flags/' + Project.getLang().split('-')[0] + '.png'
+                icon       : URL_BIN_DIR + '16x16/flags/' + Project.getLang().split('_')[0] + '.png'
             });
 
             this.parent();
@@ -1471,7 +1471,7 @@ define('controls/projects/project/site/Panel', [
                     var langs = config.langs,
                         lang  = Project.getLang();
 
-                    langs = langs.split(',');
+                    //langs = langs.split(',');
 
                     var needles = [];
 

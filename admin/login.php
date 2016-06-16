@@ -14,7 +14,7 @@ $languages = QUI::availableLanguages();
 <html lang="de"> <!--<![endif]-->
 <head>
     <!-- HTML5
-          ================================================== -->
+         ================================================== -->
     <!--[if lt IE 9]>
     <script src="<?php echo URL_BIN_DIR; ?>js/mvc/html5.js"></script>
     <![endif]-->
@@ -333,108 +333,100 @@ $languages = QUI::availableLanguages();
             }
         });
 
-        var languages = <?php echo json_encode($languages); ?>
+        var languages   = <?php echo json_encode($languages); ?>;
+        var URL_BIN_DIR = "<?php echo URL_BIN_DIR ?>";
 
-            document.id(window).addEvent('load', function () {
-                require([
-                    'qui/controls/buttons/Select'
-                ], function (QUISelect) {
-                    var Logo = document.getElement('.logo'),
-                        Linp = document.getElement('.logininput');
+        var needles = ['Locale'];
 
-                    Logo.addClass('animated');
-                    Logo.addClass('swing');
+        for (var i = 0, len = languages.length; i < len; i++) {
+            needles.push('locale/quiqqer/system/' + languages[i]);
+            needles.push('locale/quiqqer/quiqqer/' + languages[i]);
+            needles.push('locale/quiqqer/countries/' + languages[i]);
+        }
 
-                    document.id('username').focus();
+        document.id(window).addEvent('load', function () {
+            require(needles, loginLoad, loginLoad);
+        });
 
-                    window.LangSelect = new QUISelect({
-                        maxDropDownHeight: 300,
-                        styles           : {
-                            marginLeft: 10,
-                            width     : 130
-                        },
-                        events           : {
-                            onChange: function (val) {
-                                setLanguage(val);
-                            }
+        var loginLoad = function (QUILocale) {
+            QUILocale.setCurrent('en_EN');
+
+            require(['qui/controls/buttons/Select'], function (QUISelect) {
+                var Logo = document.getElement('.logo'),
+                    Linp = document.getElement('.logininput');
+
+                Logo.addClass('animated');
+                Logo.addClass('swing');
+
+                document.id('username').focus();
+
+                window.LangSelect = new QUISelect({
+                    maxDropDownHeight: 300,
+                    styles           : {
+                        marginLeft: 10,
+                        width     : 130
+                    },
+                    events           : {
+                        onChange: function (val) {
+                            setLanguage(val);
                         }
-                    }).inject(Linp);
+                    }
+                }).inject(Linp);
 
-                    <?php
-
-                    $url_bin_dir = URL_BIN_DIR;
-
-                    foreach ($languages as $lang) {
-                        $langText = '';
-
-                        switch ($lang) {
-                            case 'de':
-                                $langText = 'Deutsch';
-                                break;
-                            case 'en':
-                                $langText = 'English';
-                                break;
-
-                            default:
-                                continue 2;
-                        }
-
-                        echo "
-
-                            window.LangSelect.appendChild(
-                                '{$langText}',
-                                '{$lang}',
-                                '{$url_bin_dir}16x16/flags/{$lang}.png'
-                            );
-
-                        ";
+                for (var i = 0, len = languages.length; i < len; i++) {
+                    if (languages[i] != 'de_DE' && languages[i] != 'en_EN') {
+                        continue;
                     }
 
-                    ?>
+                    window.LangSelect.appendChild(
+                        QUILocale.translateCode(languages[i]),
+                        languages[i],
+                        URL_BIN_DIR + '16x16/flags/' + languages[i].split('_')[0] + '.png'
+                    );
+                }
 
-                    // browser language
-                    var lang = 'en';
+                // browser language
+                var lang = 'en_EN';
 
-                    if ("language" in navigator) {
-                        lang = navigator.language;
+                if ("language" in navigator) {
+                    lang = navigator.language;
 
-                    } else if ("browserLanguage" in navigator) {
-                        lang = navigator.browserLanguage;
+                } else if ("browserLanguage" in navigator) {
+                    lang = navigator.browserLanguage;
 
-                    } else if ("systemLanguage" in navigator) {
-                        lang = navigator.systemLanguage;
+                } else if ("systemLanguage" in navigator) {
+                    lang = navigator.systemLanguage;
 
-                    } else if ("userLanguage" in navigator) {
-                        lang = navigator.userLanguage;
-                    }
+                } else if ("userLanguage" in navigator) {
+                    lang = navigator.userLanguage;
+                }
 
-                    lang = lang.substr(0, 2);
+                lang = lang.substr(0, 2);
 
-                    switch (lang) {
-                        case 'de':
-                        case 'en':
-                            break;
+                switch (lang) {
+                    case 'de_DE':
+                    case 'en_EN':
+                        break;
 
-                        default:
-                            lang = 'en';
-                            break;
-                    }
+                    default:
+                        lang = 'en_EN';
+                        break;
+                }
 
-                    window.setLanguage(lang);
+                window.setLanguage(lang);
 
-
-                    document.id('username').focus();
-                });
+                document.id('username').focus();
             });
+        };
 
         var setLanguage = function (lang) {
             switch (lang) {
-                case 'de':
-                case 'en':
+                case 'de_DE':
+                case 'en_EN':
                     break;
 
                 default:
-                    lang = 'en';
+                    lang = 'en_EN';
                     break;
             }
 

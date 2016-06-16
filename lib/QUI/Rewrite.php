@@ -1604,6 +1604,7 @@ class Rewrite
             unset($params['project']);
             unset($params['id']);
             unset($params['lang']);
+            unset($params['country']);
         }
 
         // Wenn nicht alles da ist dann wird ein Exception geworfen

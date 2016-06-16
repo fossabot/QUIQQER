@@ -2,7 +2,7 @@
 <locales>
 
     <file src="lib/locale/languages.xml"/>
-  
+
     <groups name="quiqqer/quiqqer" datatype="js,php">
         <locale name="permission.quiqqer._header">
             <de><![CDATA[QUIQQER]]></de>
@@ -199,6 +199,10 @@
             <de><![CDATA[Bildercache on the Fly erstellen.]]></de>
             <en><![CDATA[Create image cache on the fly.]]></en>
         </locale>
+        <locale name="projects.project.settings.panel.country.default">
+            <de><![CDATA[Standard Land]]></de>
+            <en><![CDATA[Standard country]]></en>
+        </locale>
 
         <locale name="text.mail.subject">
             <de><![CDATA[QUIQQER Test E-Mail]]></de>
@@ -311,7 +315,7 @@
             <en><![CDATA[Default language]]></en>
         </locale>
         <locale name="projects.project.settings.panel.language.available">
-            <de><![CDATA[Verfügbare Sprachen]]></de>
+            <de><![CDATA[Weitere Sprachen]]></de>
             <en><![CDATA[Available languages]]></en>
         </locale>
         <locale name="projects.project.settings.panel.admin.email">

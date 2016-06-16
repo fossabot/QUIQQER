@@ -63,3 +63,24 @@
     font-style: italic;
     padding: 0;
 }
+
+.qui-project-settings-edit {
+    clear: both;
+}
+
+.qui-project-settings-edit label {
+    clear: both;
+    float: left;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.qui-project-settings-edit select {
+    max-width: 150px;
+    width: 100%;
+}
+
+.qui-project-settings-edit-title {
+    float: left;
+    width: 200px;
+}

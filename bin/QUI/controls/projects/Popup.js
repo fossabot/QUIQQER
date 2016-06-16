@@ -142,7 +142,7 @@ define('controls/projects/Popup', [
                         continue;
                     }
 
-                    langs = result[project].langs.split(',');
+                    langs = result[project].langs;
 
                     for (i = 0, len = langs.length; i < len; i++) {
                         if (allowedProject && allowedProject != project) {

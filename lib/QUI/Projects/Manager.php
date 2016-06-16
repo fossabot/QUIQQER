@@ -364,32 +364,30 @@ class Manager
      */
     public static function getProject($project, $country = false, $template = false)
     {
-        if ($country == false && isset(self::$projects[$project])
+        if ($country == false
+            && isset(self::$projects[$project])
             && isset(self::$projects[$project]['_standard'])
         ) {
             return self::$projects[$project]['_standard'];
         }
 
-        if (strpos($country, '_')) {
+        if ($country === false) {
+            self::$projects[$project]['_standard'] = new QUI\Projects\Project($project);
+            return self::$projects[$project]['_standard'];
+        }
+
+
+        if (strpos($country, '_') !== false) {
             $country = explode('_', $country)[1];
         }
 
-        if (isset(self::$projects[$project])
-            && isset(self::$projects[$project][$country])
-        ) {
+        if (isset(self::$projects[$project]) && isset(self::$projects[$project][$country])) {
             return self::$projects[$project][$country];
         }
 
         // Wenn der RAM zu voll wird, Objekte mal leeren
         if (QUI\Utils\System::memUsageToHigh()) {
             self::$projects = array();
-        }
-
-
-        if ($country === false) {
-            self::$projects[$project]['_standard'] = new QUI\Projects\Project($project);
-
-            return self::$projects[$project]['_standard'];
         }
 
         $Project = new QUI\Projects\Project($project, $country, $template);
@@ -613,7 +611,7 @@ class Manager
         $table_site     = QUI_DB_PRFX . $name . '_' . $lang . '_sites';
         $table_site_rel = QUI_DB_PRFX . $name . '_' . $lang . '_sites_relations';
 
-        $Table->appendFields($table_site, array(
+        $Table->addColumn($table_site, array(
             "id"          => "bigint(20) NOT NULL",
             "name"        => "varchar(200) NOT NULL",
             "title"       => "tinytext",
@@ -632,7 +630,7 @@ class Manager
             "extra"       => "text default NULL",
         ));
 
-        $Table->appendFields($table_site_rel, array(
+        $Table->addColumn($table_site_rel, array(
             "parent" => "bigint(20) NOT NULL",
             "child"  => "bigint(20) NOT NULL"
         ));
@@ -664,7 +662,7 @@ class Manager
         $table_media     = QUI_DB_PRFX . $name . '_media';
         $table_media_rel = QUI_DB_PRFX . $name . '_media_relations';
 
-        $Table->appendFields($table_media, array(
+        $Table->addColumn($table_media, array(
             "id"           => "bigint(20) NOT NULL",
             "name"         => "varchar(200) NOT NULL",
             "title"        => "tinytext",
@@ -683,7 +681,7 @@ class Manager
             "image_width"  => "int(6) default NULL"
         ));
 
-        $Table->appendFields($table_media_rel, array(
+        $Table->addColumn($table_media_rel, array(
             "parent" => "bigint(20) NOT NULL",
             "child"  => "bigint(20) NOT NULL"
         ));
@@ -746,7 +744,7 @@ class Manager
         $Project->setup();
 
         // Package / Plugin Setup
-        QUI::getPluginManager()->setup($Project);
+        QUI::getPluginManager()->setup();
 
         // Projekt Cache löschen
         QUI\Cache\Manager::clear('QUI::config');

@@ -240,8 +240,7 @@ define('controls/projects/project/Settings', [
          * Save the project settings
          */
         save: function () {
-            var self   = this,
-                Active = this.getCategoryBar().getActive();
+            var self = this;
 
             this.Loader.show();
             this.$onCategoryLeave(false);
@@ -325,22 +324,35 @@ define('controls/projects/project/Settings', [
                         Body.set('html', result);
 
                         // set data
-                        var Form     = Body.getElement('Form'),
-                            Standard = Form.elements.default_lang,
-                            Template = Form.elements.template,
-                            Langs    = Form.elements.langs,
+                        var Form      = Body.getElement('Form'),
+                            Standard  = Form.elements.country,
+                            Template  = Form.elements.template,
+                            Langs     = Form.elements.countries,
+                            countries = self.$config.countries;
 
-                            langs    = self.$config.langs;
+                        try {
+                            countries = JSON.decode(countries);
+                        } catch (e) {
+                            countries = {};
+                        }
 
-                        for (var i = 0, len = langs.length; i < len; i++) {
+                        var i, countryTL;
+
+                        for (i in countries) {
+                            if (!countries.hasOwnProperty(i)) {
+                                continue;
+                            }
+
+                            countryTL = Locale.get('quiqqer/countries', 'country.' + i.toUpperCase());
+
                             new Element('option', {
-                                html : Locale.translateCode(langs[i]),
-                                value: langs[i]
+                                html : countryTL,
+                                value: i.toUpperCase()
                             }).inject(Standard);
 
                             new Element('option', {
-                                html : Locale.translateCode(langs[i]),
-                                value: langs[i]
+                                html : countryTL + ': ' + Locale.translateCode(countries[i]),
+                                value: i + ':' + countries[i]
                             }).inject(Langs);
                         }
 
@@ -371,22 +383,19 @@ define('controls/projects/project/Settings', [
                             },
                             events   : {
                                 onClick: function () {
-                                    new LangPopup({
-                                        events: {
-                                            onSubmit: function (value) {
-                                                self.addLangToProject(value[0]);
-                                            }
-                                        }
-                                    }).open();
+                                    self.openLanguageDialog();
                                 }
                             }
                         }).inject(Langs, 'after');
 
-
-                        Standard.value = self.$config.default_lang;
-                        Template.value = self.$config.template;
+                        Langs.addEvent('dblclick', function () {
+                            self.openLanguageDialog(this.value.split(':')[0]);
+                        });
 
                         QUIFormUtils.setDataToForm(self.$config, Form);
+
+                        Standard.value = self.$config.country.toUpperCase();
+                        Template.value = self.$config.template;
 
                         Promise.all([
                             QUI.parse(Body),
@@ -515,6 +524,86 @@ define('controls/projects/project/Settings', [
         },
 
         /**
+         * Open the language / country assignment window
+         *
+         * @param {String} [countryCode] - edit the country code
+         */
+        openLanguageDialog: function (countryCode) {
+            var title = 'Sprache hinzufügen';
+
+            if (typeof countryCode !== 'undefined') {
+                title = 'Sprache editieren';
+            }
+            console.log(countryCode);
+            new QUIConfirm({
+                icon     : URL_BIN_DIR + '16x16/flags/default.png',
+                title    : title,
+                maxHeight: 300,
+                maxWidth : 450,
+                autoclose: false,
+                events   : {
+                    onOpen  : function (Win) {
+                        Win.Loader.show();
+
+                        Win.getContent().set({
+                            'class': 'qui-project-settings-edit',
+                            html   : '<label>' +
+                                     '     <span class="qui-project-settings-edit-title">Land</span>' +
+                                     '     <select name="country"></select>' +
+                                     '</label>' +
+                                     '<label>' +
+                                     '     <span class="qui-project-settings-edit-title">Zugwiesene Sprache</span>' +
+                                     '     <select name="languages"></select>' +
+                                     '</label>'
+                        });
+
+                        Ajax.get([
+                            'ajax_system_getAvailableLanguages',
+                            'ajax_system_getCountries'
+                        ], function (languages, countries) {
+                            var Content   = Win.getContent(),
+                                Country   = Content.getElement('[name="country"]'),
+                                Languages = Content.getElement('[name="languages"]');
+
+                            if (typeof countryCode !== 'undefined') {
+                                new Element('option', {
+                                    value: countryCode,
+                                    html : Locale.get('quiqqer/countries', 'country.' + countryCode.toUpperCase())
+                                }).inject(Country);
+
+                                Country.disabled = true;
+                            } else {
+                                for (i = 0, len = countries.length; i < len; i++) {
+                                    new Element('option', {
+                                        value: countries[i],
+                                        html : Locale.get('quiqqer/countries', 'country.' + countries[i]) +
+                                               ' (' + countries[i] + ')'
+                                    }).inject(Country);
+                                }
+                            }
+
+                            for (var i = 0, len = languages.length; i < len; i++) {
+                                new Element('option', {
+                                    value: languages[i],
+                                    html : Locale.translateCode(languages[i])
+                                }).inject(Languages);
+                            }
+
+                            Win.Loader.hide();
+                        });
+                    },
+                    onSubmit: function (Win) {
+                        var Content   = Win.getContent(),
+                            Country   = Content.getElement('[name="country"]'),
+                            Languages = Content.getElement('[name="languages"]');
+
+
+                    }
+                }
+            }).open();
+        },
+
+        /**
          * event : on panel resize
          *
          * @method controls/projects/project/Settings#$onResize
@@ -568,6 +657,7 @@ define('controls/projects/project/Settings', [
          * Add a language to the project
          *
          * @param {String} lang
+         * @deprecated
          */
         addLangToProject: function (lang) {
             var self = this;
