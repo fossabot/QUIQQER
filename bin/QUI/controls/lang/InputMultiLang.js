@@ -152,6 +152,10 @@ define('controls/lang/InputMultiLang', [
                     InputField.addEvent('change', onChange);
                 }
 
+                if (languages.length <= 1) {
+                    self.$Button.setStyle('display', 'none');
+                }
+
                 self.$Button.set({
                     html  : '<span class="fa fa-arrow-circle-o-right"></span>',
                     styles: {
@@ -216,17 +220,19 @@ define('controls/lang/InputMultiLang', [
                 height: 34
             });
 
-            moofx(list).animate({
-                height : 34,
-                opacity: 1
-            }, {
-                duration: 200,
-                callback: function () {
-                    self.$Button.getElement('span')
-                        .addClass('fa-arrow-circle-o-down')
-                        .removeClass('fa-arrow-circle-o-right');
-                }
-            });
+            if (list.length) {
+                moofx(list).animate({
+                    height : 34,
+                    opacity: 1
+                }, {
+                    duration: 200,
+                    callback: function () {
+                        self.$Button.getElement('span')
+                            .addClass('fa-arrow-circle-o-down')
+                            .removeClass('fa-arrow-circle-o-right');
+                    }
+                });
+            }
         },
 
         /**
@@ -241,6 +247,10 @@ define('controls/lang/InputMultiLang', [
             var First = list.shift();
 
             First.setStyle('height', null);
+
+            if (!list.length) {
+                return;
+            }
 
             moofx(list).animate({
                 height : 0,
